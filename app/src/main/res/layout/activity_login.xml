@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Login">
+
+    <TextView
+        android:id="@+id/tvBienvenido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_title"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvSubtitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_description"
+        android:textSize="24sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="50dp" />
+
+    <EditText
+        android:id="@+id/etCorreo"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:hint="@string/email"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:drawableStart="@android:drawable/ic_dialog_email"
+        android:paddingStart="16dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/background_blue_sky"
+        app:cornerRadius="20dp"/>
+
+    <EditText
+        android:id="@+id/etContrasena"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:textSize="20sp"
+        android:hint="@string/password"
+        android:textStyle="bold"
+        android:drawableStart="@android:drawable/ic_lock_lock"
+        android:paddingStart="16dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/background_blue_sky"
+        app:cornerRadius="20dp"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnIniciarSesion"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:textSize="20sp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/blue_brilliant"
+        app:cornerRadius="20dp"
+        android:text="@string/log_in" />
+
+    <TextView
+        android:id="@+id/tvOlvidasteContrasena"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_password"
+        android:textSize="20sp"
+        android:textColor="@color/blue_brilliant"
+        android:layout_gravity="center"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvNoTienesCuenta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_account"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="130dp"
+        android:layout_gravity="center" />
+
+</LinearLayout>

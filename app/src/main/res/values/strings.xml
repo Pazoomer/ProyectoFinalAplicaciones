@@ -46,4 +46,5 @@
     <string name="members_role">Rol de los miembros</string>
     <string name="go_back">Volver al menu principal</string>
     <string name="complete_task">Completar tarea</string>
+    <string name="name">Nombre</string>
 </resources>
