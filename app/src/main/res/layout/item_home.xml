@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:padding="8dp"
+    android:background="@color/blue_brilliant"
+    android:layout_margin="8dp"
+    android:layout_gravity="center"
+    android:cornerRadius="12dp">
+
+    <TextView
+        android:id="@+id/tv_casa_nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginRight="250dp"
+        android:text="Casa mochis"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"/>
+
+    <ImageView
+        android:id="@+id/ivHomeIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="-150dp"
+        android:src="@drawable/house"
+        android:tint="@color/white"
+        android:layout_gravity="center"/>
+
+
+
+</LinearLayout>
