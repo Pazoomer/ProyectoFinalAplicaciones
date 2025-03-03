@@ -20,6 +20,72 @@
         android:layout_gravity="center_horizontal"
         android:paddingBottom="16dp"/>
 
+    <!-- Para los botones en caso que no haya casa -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="80dp"
+        android:layout_marginRight="80dp"
+        android:visibility="visible">
+
+
+        <!-- Botón Crear Hogar -->
+        <LinearLayout
+            android:id="@+id/btn_crear_hogar_grande"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:background="@drawable/rounded_button"
+            android:padding="12dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/add_home"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crear Casa"
+                android:textSize="19sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- Botón Nuevo Hogar -->
+        <LinearLayout
+            android:id="@+id/btn_nuevo_hogar_grande"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            android:background="@drawable/rounded_button"
+            android:padding="12dp">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/add"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nueva casa"
+                android:textSize="17sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
 
     <GridView
         android:id="@+id/lista_casas"
@@ -32,15 +98,18 @@
         android:numColumns="1"
         android:padding="8dp"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="16dp" />
+        android:verticalSpacing="16dp"
+        android:visibility="gone"/>
 
+    <!-- Para los botones en caso que si haya casa -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="185dp">
+        android:layout_marginLeft="185dp"
+        android:visibility="gone">
 
 
         <!-- Botón Crear Hogar -->
@@ -62,7 +131,7 @@
             <TextView
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
-                android:text="Create home"
+                android:text="Crear Casa"
                 android:textSize="13sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
@@ -89,14 +158,26 @@
         <TextView
             android:layout_width="75dp"
             android:layout_height="wrap_content"
-            android:text="New Home"
-            android:textSize="15sp"
+            android:text="Nueva casa"
+            android:textSize="13sp"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cerrar sesión"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center"
+        android:clickable="true" />
+
+
 
 
 </LinearLayout>
