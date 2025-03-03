@@ -13,6 +13,9 @@
         android:theme="@style/Theme.TaskFam"
         tools:targetApi="31">
         <activity
+
+            android:name=".AddEdit"
+
             android:name=".CrearUnirseHogar"
             android:exported="false" />
         <activity
