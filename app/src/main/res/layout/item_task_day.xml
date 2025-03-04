@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingVertical="20dp"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            >
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/tv_day"
@@ -26,8 +27,8 @@
                 android:text="Lunes"
                 android:textColor="@color/white"
                 android:textSize="30sp"
-                android:layout_marginRight="20dp"
-                />
+                android:layout_marginRight="20dp" />
+
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="match_parent"
@@ -35,10 +36,126 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:progressDrawable="@drawable/progress_bar"
                 android:max="2"
-                android:progress="1"/>
+                android:progress="1" />
+        </LinearLayout>
+
+        <!-- Tarea de ejemplo, se eliminará después -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+
+            <LinearLayout
+                android:layout_width="80dp"
+                android:layout_height="50dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginEnd="10dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/circle_color_member"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chuy"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:orientation="vertical"
+                android:background="@drawable/background_white_light"
+                android:backgroundTint="@color/white_light"
+                android:elevation="10dp"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Limpiar baño"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/gray_dark"
+                    android:text="Tienes que limpiar bien chuy, la otra vez dejaste muy  sucio"
+                    android:textSize="16sp"
+                    android:textStyle="normal"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
+        <!-- Este es otro ejemplo, luego se cambiará -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+
+            <LinearLayout
+                android:layout_width="80dp"
+                android:layout_height="50dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginEnd="10dp">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/circle_color_member"
+                    android:backgroundTint="@color/green"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Abel"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:orientation="vertical"
+                android:background="@drawable/background_white_light"
+                android:backgroundTint="@color/white_light"
+                android:elevation="10dp"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Limpiar baño"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/gray_dark"
+                    android:text="Tienes que limpiar bien chuy, la otra vez dejaste muy  sucio"
+                    android:textSize="16sp"
+                    android:textStyle="normal"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
+
 </LinearLayout>
