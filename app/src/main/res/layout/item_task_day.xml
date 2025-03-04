@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="200dp"
     android:orientation="vertical"
     android:padding="5dp">
 
@@ -11,40 +10,35 @@
         android:layout_height="match_parent"
         android:paddingVertical="20dp"
         android:orientation="vertical">
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+
+            <TextView
+                android:id="@+id/tv_day"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_day"
+                android:gravity="center"
+                android:text="Lunes"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                android:layout_marginRight="20dp"
+                />
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progressDrawable="@drawable/progress_bar"
+                android:max="2"
+                android:progress="1"/>
 
         </LinearLayout>
-        <TextView
-            android:id="@+id/tv_day"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/background_day"
-            android:gravity="center"
-            android:text="Lunes"
-            android:textColor="@color/white"
-            android:textSize="30sp"
-            />
 
-        <TextView
-            android:id="@+id/tv_days"
-            android:layout_width="match_parent"
-            android:layout_height="17dp"
-            android:gravity="center"
-            android:text="Everyday"
-            android:textSize="10sp"
-            />
 
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="17:00"
-            android:textSize="14sp"
-            />
     </LinearLayout>
 </LinearLayout>

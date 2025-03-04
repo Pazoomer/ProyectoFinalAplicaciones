@@ -32,6 +32,8 @@
                 android:textColor="#00B2BE"/>
         </LinearLayout>
 
+
+
         <!-- Aquí iría el contenido de la pantalla -->
     </LinearLayout>
 
