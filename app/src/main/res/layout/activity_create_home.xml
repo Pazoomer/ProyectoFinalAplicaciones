@@ -37,16 +37,21 @@
         android:textStyle="bold"
         android:drawableStart="@drawable/baseline_text_format_24"
         android:paddingStart="16dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="15dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:background="@drawable/background_blue_sky"
         app:cornerRadius="20dp"/>
 
-    <SeekBar
-        android:id="@+id/seekColor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/btnSeleccionColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/blue_brilliant"
+        app:cornerRadius="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Selecciona un color para tu hogar"/>
 
     <!-- Subtítulo permisos -->
     <TextView
