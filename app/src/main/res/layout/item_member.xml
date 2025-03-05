@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:marginTop="8dp">
+        android:layout_marginTop="8dp">
 
         <LinearLayout
             android:id="@+id/btnTodosDias"
@@ -87,7 +87,7 @@
             android:orientation="horizontal"
             android:background="@drawable/rounded_button_light"
             android:padding="8dp"
-            android:marginTop="8dp">
+            android:layout_marginTop="8dp">
 
             <CheckBox
                 android:id="@+id/cbTodos"
@@ -111,12 +111,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Eliminar"
+            android:text="@string/eliminate"
             android:textAlignment="center"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:underlineText="true" />
+            android:textStyle="bold"/>
+<!--            android:underlineText="true" -->
 
     </LinearLayout>
 

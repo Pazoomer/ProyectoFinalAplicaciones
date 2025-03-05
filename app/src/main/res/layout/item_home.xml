@@ -7,8 +7,9 @@
     android:padding="8dp"
     android:background="@color/blue_brilliant"
     android:layout_margin="8dp"
-    android:layout_gravity="center"
-    android:cornerRadius="12dp">
+    android:layout_gravity="center">
+<!--    android:cornerRadius="12dp"-->
+
 
     <TextView
         android:id="@+id/tv_casa_nombre"

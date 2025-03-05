@@ -17,7 +17,7 @@
         android:layout_marginLeft="10dp" />
 
     <TextView
-        android:id="@+id/tvBienvenido"
+        android:id="@+id/tvConfiguracion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/configuration"
@@ -56,7 +56,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
         <EditText
-            android:id="@+id/etCorreo"
+            android:id="@+id/etNombreHogar"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:hint="@string/name_house"
@@ -85,14 +85,14 @@
 
             android:orientation="horizontal">
             <ImageView
-                android:id="@+id/ivRole"
+                android:id="@+id/ivRoleIcon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/people"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp" />
         <EditText
-            android:id="@+id/etContrasena"
+            android:id="@+id/etRolMembers"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:textSize="20sp"
@@ -102,6 +102,31 @@
             android:background="@drawable/background_blue_sky"
             android:inputType="textPassword" />
         </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="@drawable/background_blue_sky">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:layout_marginLeft="130dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Puede editar"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
+
         <ListView
             android:id="@+id/listViewMiembros"
             android:layout_width="match_parent"
@@ -110,22 +135,12 @@
             android:dividerHeight="1dp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnIniciarSesion"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="20sp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:backgroundTint="@color/gray_light"
-        app:cornerRadius="20dp"
-        android:text="@string/go_back" />
-
     <TextView
-        android:id="@+id/tvNoTienesCuenta"
+        android:id="@+id/tvBorrarHogar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/delete_house"
+        android:layout_marginTop="10dp"
         android:textColor="@color/red"
         android:textSize="20sp"
         android:textStyle="bold"
