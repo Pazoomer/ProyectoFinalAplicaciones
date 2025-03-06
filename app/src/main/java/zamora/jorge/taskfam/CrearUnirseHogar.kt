@@ -1,20 +1,84 @@
 package zamora.jorge.taskfam
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.BaseAdapter
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import zamora.jorge.taskfam.databinding.ActivityCrearUnirseHogarBinding
+
+
 
 class CrearUnirseHogar : AppCompatActivity() {
+
+    private lateinit var binding: ActivityCrearUnirseHogarBinding
+    private lateinit var casaAdapter: CasaAdapter
+    private val listaCasas = mutableListOf<Casa>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_crear_unirse_hogar)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        binding = ActivityCrearUnirseHogarBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        llenarListaCasas()
+
+        casaAdapter = CasaAdapter(this, listaCasas)
+        binding.listaCasas.adapter = casaAdapter
+
+        // Manejar clic en los ítems del GridView
+        binding.listaCasas.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            val tvCasaNombre = view.findViewById<TextView>(R.id.tv_casa_nombre)
+            val casaNombre = tvCasaNombre.text.toString()
+
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("CASA_NOMBRE", casaNombre)
+            startActivity(intent)
+        }
+
+        // Configurar botones de navegación
+        binding.btnCrearHogar.setOnClickListener {
+            startActivity(Intent(this, CreateHome::class.java))
+        }
+        binding.btnCrearHogarGrande.setOnClickListener {
+            startActivity(Intent(this, CreateHome::class.java))
+        }
+        binding.btnNuevoHogar.setOnClickListener {
+            startActivity(Intent(this, JoinHouse::class.java))
+        }
+        binding.btnNuevoHogarGrande.setOnClickListener {
+            startActivity(Intent(this, JoinHouse::class.java))
+        }
+    }
+
+    private fun llenarListaCasas() {
+        listaCasas.apply {
+            add(Casa("Casa Mochis"))
+            add(Casa("Casa Monterrey"))
+            add(Casa("Casa Guadalajara"))
+            add(Casa("Casa CDMX"))
+            add(Casa("Casa Cancún"))
+            add(Casa("Casa Puebla"))
+        }
+    }
+
+    inner class CasaAdapter(private val context: Context, private val casas: List<Casa>) : BaseAdapter() {
+        override fun getCount(): Int = casas.size
+        override fun getItem(position: Int): Any = casas[position]
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_home, parent, false)
+
+            val tvCasaNombre = view.findViewById<TextView>(R.id.tv_casa_nombre)
+            tvCasaNombre.text = casas[position].nombre
+
+            return view
         }
     }
 }

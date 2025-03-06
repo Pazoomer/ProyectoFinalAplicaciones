@@ -31,7 +31,7 @@ class Register : AppCompatActivity() {
         }
 
         binding.btnRegistrarse.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, CrearUnirseHogar::class.java)
             startActivity(intent)
         }
     }
