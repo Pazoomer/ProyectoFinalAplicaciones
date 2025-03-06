@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Casa mochis"
+                android:text="Casa mochiss"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -35,7 +35,7 @@
 
         <ListView
             android:id="@+id/lv_dias"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:divider="@android:color/transparent"
             android:dividerHeight="10dp"/>

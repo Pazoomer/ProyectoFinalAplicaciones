@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -47,11 +48,14 @@ class MainActivity : AppCompatActivity() {
     private fun llenarListaDias() {
         listaDias.add(Day("Lunes", listOf(
             Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            Task("Lavar platos", "No olvides los vasos", "Abel")
-        )))
+            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
+            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
+            Task("Lavar platos", "No olvides los vasos", "Abel"),
+            Task("sip", "No olvides los vasos", "Juanito")
+        ), false))
         listaDias.add(Day("Martes", listOf(
             Task("Sacar la basura", "Hoy es día de recolección", "Maria")
-        )))
+        ), false))
     }
 
     class DayAdapter(private val context: Context, private val dias: List<Day>) : BaseAdapter() {
@@ -67,6 +71,7 @@ class MainActivity : AppCompatActivity() {
 
             val dia = dias[position]
             tvDia.text = dia.nombre
+
             progressBar.max = dia.tareas.size
             progressBar.progress = dia.tareas.count { /* Lógica para determinar si está completada */ false }
 

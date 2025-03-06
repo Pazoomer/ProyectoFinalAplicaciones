@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context=".TaskDetail">
+    <ImageButton
+        android:id="@+id/ivBackArrow"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        />
+
+    <TextView
+        android:layout_marginTop="50dp"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:id="@+id/tv_titulotarea"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lavar trastes"/>
+    <TextView
+        android:textSize="20sp"
+        android:id="@+id/tv_descripcion"
+        android:textAlignment="center"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Limpiar los trastes con cloro, ya tienen mucha comida"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_color"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/circle_color_member" />
+
+            <TextView
+                android:id="@+id/tv_miembro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chuy"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginEnd="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- Día Lunes -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="L"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbLunes"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Martes -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ma"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbMartes"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Miércoles -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mi"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbMiercoles"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Jueves -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="J"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbJueves"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Viernes -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="V"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbViernes"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Sábado -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbSabado"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Domingo -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="D"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbDomingo"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+        </LinearLayout>
+        <ImageButton
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/task_button"
+            android:gravity="center"
+            android:padding="0dp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_color2"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/circle_color_member" />
+
+            <TextView
+                android:id="@+id/tv_miembro2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chuy"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginEnd="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- Día Lunes -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="L"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbLunes2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Martes -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ma"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbMartes2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Miércoles -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mi"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbMiercoles2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Jueves -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="J"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbJueves2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Viernes -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="V"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbViernes2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Sábado -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbSabado2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+            <!-- Día Domingo -->
+            <LinearLayout
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="D"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <CheckBox
+                    android:id="@+id/cbDomingo2"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:buttonTint="@color/black"/>
+            </LinearLayout>
+
+        </LinearLayout>
+        <ImageButton
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/task_button"
+            android:gravity="center"
+            android:padding="0dp" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
