@@ -38,7 +38,7 @@ class CreateHome : AppCompatActivity() {
         }
 
         binding.btnAceptarCrearHogar.setOnClickListener(){
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, AddEdit::class.java)
             startActivity(intent)
         }
 

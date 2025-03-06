@@ -3,11 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
     android:elevation="4dp">
 
     <TextView
-        android:id="@+id/tvAsignarDias"
+        android:id="@+id/tvAsignarDiasA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Asignar a Beto los días:"
@@ -77,8 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
-        android:layout_marginTop="8dp">
+        android:padding="8dp">
 
         <LinearLayout
             android:id="@+id/btnTodosDias"
@@ -86,8 +84,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="@drawable/rounded_button_light"
-            android:padding="8dp"
-            android:layout_marginTop="8dp">
+            android:padding="8dp">
 
             <CheckBox
                 android:id="@+id/cbTodos"
@@ -110,13 +107,12 @@
             android:id="@+id/tvEliminar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:text="@string/eliminate"
             android:textAlignment="center"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="24sp"
             android:textStyle="bold"/>
-<!--            android:underlineText="true" -->
 
     </LinearLayout>
 
