@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,128 +7,137 @@
     android:orientation="vertical"
     tools:context=".AddEdit">
 
-    <ImageView
-        android:id="@+id/ivBackArrow"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/back_arrow"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp" />
-
-    <TextView
-        android:id="@+id/tvAgregarEditar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Agregar/Editar tarea"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center"
-        android:layout_marginBottom="8dp" />
-
-    <TextView
-        android:id="@+id/tvSubtitulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ingrese/Actualice los datos \nde la tarea"
-        android:textSize="20sp"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="10dp" />
-
-    <EditText
-        android:id="@+id/etNombreTarea"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:hint="Nombre de la tarea"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:drawableStart="@drawable/baseline_text_format_24"
-        android:paddingStart="16dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:background="@drawable/background_blue_sky"
-        app:cornerRadius="20dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
-    <EditText
-        android:id="@+id/etDescripcion"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="20sp"
-        android:hint=" Descripción breve"
-        android:textStyle="bold"
-        android:drawableStart="@drawable/baseline_notes_24"
-        android:paddingStart="16dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:background="@drawable/background_blue_sky"
-        app:cornerRadius="20dp"
-        android:inputType="textPassword" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvSeleccion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Seleccione los habitantes que se\n harán cargo"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp" />
+            <ImageView
+                android:id="@+id/ivBackArrow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/back_arrow"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp" />
+
+            <TextView
+                android:id="@+id/tvAgregarEditar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Agregar/Editar tarea"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etNombreTarea"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:hint=" Nombre de la tarea"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:drawableStart="@drawable/baseline_text_format_24"
+                android:paddingStart="16dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/background_blue_sky"
+                app:cornerRadius="20dp"/>
+
+            <EditText
+                android:id="@+id/etDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:textSize="20sp"
+                android:hint=" Descripción breve"
+                android:textStyle="bold"
+                android:drawableStart="@drawable/baseline_notes_24"
+                android:paddingStart="16dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/background_blue_sky"
+                app:cornerRadius="20dp"/>
+
+            <TextView
+                android:id="@+id/tvSeleccion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seleccione los habitantes que se\n harán cargo"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/sSeleccionMiembro"
+                    android:layout_width="227dp"
+                    android:layout_height="52dp" />
+
+                <Button
+                    android:id="@+id/btnAgregarHabitante"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:layout_marginLeft="12dp"
+                    android:backgroundTint="@color/purple"
+                    android:drawableTop="@drawable/baseline_person_add_24"
+                    app:cornerRadius="20dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ListView
+                    android:id="@+id/lvMiembros"
+                    android:layout_width="340dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="124dp"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Spinner
-            android:layout_width="227dp"
-            android:layout_height="52dp" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <Button
-            android:id="@+id/btnAgregarHabitante"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_marginLeft="12dp"
-            android:backgroundTint="@color/purple"
-            android:drawableTop="@drawable/baseline_person_add_24"
-            app:cornerRadius="20dp" />
+            android:id="@+id/btnAgregarEditar"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:textSize="20sp"
+            android:backgroundTint="@color/blue_brilliant"
+            app:cornerRadius="20dp"
+            android:text="Agregar/Editar"/>
 
+        <TextView
+            android:id="@+id/tvEliminar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eliminar"
+            android:textSize="20sp"
+            android:textColor="@color/red"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginTop="15dp"/>
     </LinearLayout>
 
-    <ListView
-        android:layout_width="340dp"
-        android:layout_height="124dp"
-        android:layout_gravity="center"/>
-
-    <Button
-        android:id="@+id/btnAgregarEditar"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="20sp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/blue_brilliant"
-        app:cornerRadius="20dp"
-        android:text="Agregar/Editar"/>
-
-    <TextView
-        android:id="@+id/tvEliminar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Eliminar"
-        android:textSize="20sp"
-        android:layout_marginTop="15dp"
-        android:textColor="@color/red"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:clickable="true"
-        android:focusable="true"/>
-    
 </LinearLayout>
