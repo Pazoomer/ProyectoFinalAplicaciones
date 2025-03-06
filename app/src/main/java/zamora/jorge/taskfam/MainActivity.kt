@@ -1,10 +1,12 @@
 package zamora.jorge.taskfam
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.ListView
@@ -43,6 +45,9 @@ class MainActivity : AppCompatActivity() {
         val dayAdapter = DayAdapter(this, listaDias)
         binding.lvDias.adapter = dayAdapter
 
+
+
+
     }
 
     private fun llenarListaDias() {
@@ -58,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         ), false))
     }
 
-    class DayAdapter(private val context: Context, private val dias: List<Day>) : BaseAdapter() {
+    private class DayAdapter(private val context: Context, private val dias: List<Day>) : BaseAdapter() {
         override fun getCount(): Int = dias.size
         override fun getItem(position: Int): Any = dias[position]
         override fun getItemId(position: Int): Long = position.toLong()
@@ -79,11 +84,22 @@ class MainActivity : AppCompatActivity() {
             val listViewTareas: ListView = view.findViewById(R.id.lv_tareas)
             listViewTareas.adapter = tareaAdapter
 
+            // Configurar el onItemClickListener para el ListView de tareas
+            listViewTareas.onItemClickListener = AdapterView.OnItemClickListener { _, view, tareaPosition, _ ->
+                val tvTituloTarea = view.findViewById<TextView>(R.id.tv_titulotarea)
+                val tareaNombre = tvTituloTarea.text.toString()
+
+                // Aquí puedes manejar el clic y pasar la tarea a otra actividad si lo deseas
+                val intent = Intent(context, TaskDetail::class.java)
+                intent.putExtra("TAREA_NOMBRE", tareaNombre)
+                context.startActivity(intent)
+            }
+
             return view
         }
     }
 
-    class TaskAdapter(private val context: Context, private val tareas: List<Task>) : BaseAdapter() {
+    private class TaskAdapter(private val context: Context, private val tareas: List<Task>) : BaseAdapter() {
         override fun getCount(): Int = tareas.size
         override fun getItem(position: Int): Any = tareas[position]
         override fun getItemId(position: Int): Long = position.toLong()
