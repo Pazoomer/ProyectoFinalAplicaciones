@@ -14,11 +14,13 @@
         android:orientation="vertical">
 
         <ImageView
+
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:background="@drawable/circle_color_member" />
 
         <TextView
+            android:id="@+id/tv_miembro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chuy"
@@ -42,6 +44,7 @@
             android:layout_weight="1">
 
             <TextView
+                android:id="@+id/tv_titulotarea"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Limpiar baño"
@@ -49,6 +52,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_descripciontarea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tienes que limpiar bien chuy, la otra vez dejaste muy sucio"
