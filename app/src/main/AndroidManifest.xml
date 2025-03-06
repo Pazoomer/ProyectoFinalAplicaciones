@@ -16,9 +16,6 @@
             android:name=".TaskDetail"
             android:exported="false" />
         <activity
-            android:name=".task"
-            android:exported="false" />
-        <activity
             android:name=".CreateHome"
             android:exported="false" />
         <activity

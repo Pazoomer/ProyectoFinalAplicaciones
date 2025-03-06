@@ -3,15 +3,16 @@ package zamora.jorge.taskfam
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -29,8 +30,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-
-
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -41,24 +40,32 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.addTask.setOnClickListener {
+            val intent = Intent(this, AddEdit::class.java)
+            startActivity(intent)
+        }
+
+        binding.ivSettings.setOnClickListener {
+            val intent = Intent(this, Settings::class.java)
+            startActivity(intent)
+        }
+
         llenarListaDias()
         val dayAdapter = DayAdapter(this, listaDias)
         binding.lvDias.adapter = dayAdapter
-
-
-
-
     }
 
     private fun llenarListaDias() {
         listaDias.add(Day("Lunes", listOf(
             Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            Task("Lavar platos", "No olvides los vasos", "Abel"),
-            Task("sip", "No olvides los vasos", "Juanito")
+            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy")
+            //Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
+            //Task("Lavar platos", "No olvides los vasos", "Abel"),
+            //Task("sip", "No olvides los vasos", "Juanito")
         ), false))
+
         listaDias.add(Day("Martes", listOf(
+            Task("Sacar la basura", "Hoy es día de recolección", "Maria"),
             Task("Sacar la basura", "Hoy es día de recolección", "Maria")
         ), false))
     }
@@ -78,23 +85,22 @@ class MainActivity : AppCompatActivity() {
             tvDia.text = dia.nombre
 
             progressBar.max = dia.tareas.size
-            progressBar.progress = dia.tareas.count { /* Lógica para determinar si está completada */ false }
+            progressBar.progress = dia.tareas.count { false }
 
             val tareaAdapter = TaskAdapter(context, dia.tareas)
             val listViewTareas: ListView = view.findViewById(R.id.lv_tareas)
             listViewTareas.adapter = tareaAdapter
 
-            // Configurar el onItemClickListener para el ListView de tareas
             listViewTareas.onItemClickListener = AdapterView.OnItemClickListener { _, view, tareaPosition, _ ->
-                val tvTituloTarea = view.findViewById<TextView>(R.id.tv_titulotarea)
-                val tareaNombre = tvTituloTarea.text.toString()
+                val tarea = dia.tareas[tareaPosition]
 
-                // Aquí puedes manejar el clic y pasar la tarea a otra actividad si lo deseas
-                val intent = Intent(context, TaskDetail::class.java)
-                intent.putExtra("TAREA_NOMBRE", tareaNombre)
+                val intent = Intent(context, TaskDetail::class.java).apply {
+                    putExtra("TAREA_NOMBRE", tarea.title)
+                    putExtra("TAREA_DESCRIPCION", tarea.description)
+                    putExtra("TAREA_MIEMBRO", tarea.miembro)
+                }
                 context.startActivity(intent)
             }
-
             return view
         }
     }

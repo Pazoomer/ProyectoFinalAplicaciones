@@ -3,8 +3,6 @@ package zamora.jorge.taskfam
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.Button
-import android.widget.RelativeLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -38,7 +36,7 @@ class CreateHome : AppCompatActivity() {
         }
 
         binding.btnAceptarCrearHogar.setOnClickListener(){
-            val intent = Intent(this, AddEdit::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
