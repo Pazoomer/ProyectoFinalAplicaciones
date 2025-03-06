@@ -54,6 +54,10 @@ class CrearUnirseHogar : AppCompatActivity() {
         binding.btnNuevoHogarGrande.setOnClickListener {
             startActivity(Intent(this, JoinHouse::class.java))
         }
+
+        binding.btnCerrarSesion.setOnClickListener{
+            startActivity(Intent(this,Login::class.java))
+        }
     }
 
     private fun llenarListaCasas() {

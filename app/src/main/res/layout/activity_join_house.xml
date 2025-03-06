@@ -8,21 +8,14 @@
     android:layout_height="match_parent"
     tools:context=".JoinHouse">
 
-    <LinearLayout
+    <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="8dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/back_arrow"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/back"/>
-    </LinearLayout>
 
 
     <LinearLayout
