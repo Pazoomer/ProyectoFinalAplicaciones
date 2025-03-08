@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -17,13 +18,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.get
 import zamora.jorge.taskfam.data.Day
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var taskAdapter: TaskAdapter
     private val listaDias = mutableListOf<Day>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,8 +58,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun llenarListaDias() {
         listaDias.add(Day("Lunes", listOf(
-            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy")
+            Task("Cocinar", "Tienes que limpiar bien", "Chuy"),
+            Task("Cocinar2", "Tienes que limpiar bien", "Chuy")
             //Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
             //Task("Lavar platos", "No olvides los vasos", "Abel"),
             //Task("sip", "No olvides los vasos", "Juanito")
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         listaDias.add(Day("Martes", listOf(
             Task("Sacar la basura", "Hoy es día de recolección", "Maria"),
-            Task("Sacar la basura", "Hoy es día de recolección", "Maria")
+            Task("Sacar la basura2", "Hoy es día de recolección", "Maria")
         ), false))
     }
 
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         override fun getItemId(position: Int): Long = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            Log.d("DayAdapter", "getView called with position: $position")
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_day, parent, false)
 
             val tvDia: TextView = view.findViewById(R.id.tv_dia)
@@ -88,20 +90,30 @@ class MainActivity : AppCompatActivity() {
             progressBar.progress = dia.tareas.count { false }
 
             val tareaAdapter = TaskAdapter(context, dia.tareas)
+            Log.d("DayAdapter", "TaskAdapter created with ${dia.tareas.size} items")
+
             val listViewTareas: ListView = view.findViewById(R.id.lv_tareas)
             listViewTareas.adapter = tareaAdapter
+            setListViewHeightBasedOnChildren(listViewTareas)
 
-            listViewTareas.onItemClickListener = AdapterView.OnItemClickListener { _, view, tareaPosition, _ ->
-                val tarea = dia.tareas[tareaPosition]
-
-                val intent = Intent(context, TaskDetail::class.java).apply {
-                    putExtra("TAREA_NOMBRE", tarea.title)
-                    putExtra("TAREA_DESCRIPCION", tarea.description)
-                    putExtra("TAREA_MIEMBRO", tarea.miembro)
-                }
-                context.startActivity(intent)
-            }
             return view
+        }
+        private fun setListViewHeightBasedOnChildren(listView: ListView) {
+            val listAdapter = listView.adapter ?: return
+            var totalHeight = 0
+            for (i in 0 until listAdapter.count) {
+                Log.d("DayAdapter", "Setting height for item $i")
+                val listItem = listAdapter.getView(i, null, listView)
+                listItem.measure(
+                    View.MeasureSpec.makeMeasureSpec(listView.width, View.MeasureSpec.AT_MOST),
+                    View.MeasureSpec.UNSPECIFIED
+                )
+                totalHeight += listItem.measuredHeight
+            }
+            val params = listView.layoutParams
+            params.height = totalHeight + (listView.dividerHeight * (listAdapter.count - 1))
+            listView.layoutParams = params
+            listView.requestLayout()
         }
     }
 
@@ -111,17 +123,28 @@ class MainActivity : AppCompatActivity() {
         override fun getItemId(position: Int): Long = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            Log.d("TaskAdapter", "getView called with position: $position")
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_task_list, parent, false)
 
             val tvMiembro: TextView = view.findViewById<TextView>(R.id.tv_miembro)
             val tvTitulo: TextView= view.findViewById<TextView>(R.id.tv_titulotarea)
             val tvDescripcion: TextView = view.findViewById<TextView>(R.id.tv_descripciontarea)
+            val llContainer: LinearLayout = view.findViewById<LinearLayout>(R.id.ll_container)
 
             val tarea = tareas[position]
             tvMiembro.text = tarea.miembro
             tvTitulo.text = tarea.title
             tvDescripcion.text = tarea.description
+            Log.d("TaskAdapter", "Task title: ${tarea.title}")
 
+            llContainer.setOnClickListener{
+                val intent = Intent(context, TaskDetail::class.java).apply {
+                    putExtra("TAREA_NOMBRE", tarea.title)
+                    putExtra("TAREA_DESCRIPCION", tarea.description)
+                    putExtra("TAREA_MIEMBRO", tarea.miembro)
+                }
+                context.startActivity(intent)
+            }
             return view
         }
     }

@@ -2,6 +2,7 @@ package zamora.jorge.taskfam
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -26,13 +27,35 @@ class Login : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.tvNoTienesCuenta.setOnClickListener {
-            val intent = Intent(this, Register::class.java)
-            startActivity(intent)
+            noTienesCuenta()
         }
 
         binding.btnIniciarSesion.setOnClickListener {
-            val intent = Intent(this, CrearUnirseHogar::class.java)
-            startActivity(intent)
+            iniciarSesion()
         }
+    }
+
+    fun noTienesCuenta() {
+        val intent = Intent(this, Register::class.java)
+        startActivity(intent)
+    }
+
+    fun iniciarSesion() {
+        //Obtener datos
+        val correo=binding.etCorreo
+        val contrasena=binding.etContrasena
+
+        //Validar datos
+        if(correo.text.toString().isEmpty() || contrasena.text.toString().isEmpty()) {
+            Toast.makeText(this, "Por favor ingrese sus datos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        //TODO: Revisar credenciales en la base de datos
+
+        //Cambiar actividad
+        val intent = Intent(this, CrearUnirseHogar::class.java)
+        intent.putExtra("correo", correo.text.toString())
+        startActivity(intent)
     }
 }
