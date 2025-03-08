@@ -8,11 +8,14 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     tools:context=".TaskDetail">
-    <ImageButton
+    <ImageView
         android:id="@+id/ivBackArrow"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        />
+        android:src="@drawable/back_arrow"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp" />
 
     <TextView
         android:layout_marginTop="50dp"

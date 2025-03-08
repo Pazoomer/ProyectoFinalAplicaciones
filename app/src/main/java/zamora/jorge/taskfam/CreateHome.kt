@@ -3,6 +3,7 @@ package zamora.jorge.taskfam
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -36,8 +37,7 @@ class CreateHome : AppCompatActivity() {
         }
 
         binding.btnAceptarCrearHogar.setOnClickListener(){
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            createHome()
         }
 
         binding.ivBackArrow.setOnClickListener(){
@@ -59,6 +59,25 @@ class CreateHome : AppCompatActivity() {
             }
         })
         ambilWarnaDialog.show()
+    }
+
+    private fun createHome(){
+        //Obtener datos
+        val nombre=binding.etNombreHogar.text
+        val color=binding.btnSeleccionColor.solidColor
+        val edit=binding.rbEdit.isSelected
+
+        // Validar campos vacíos
+        if (nombre.isEmpty()) {
+            Toast.makeText(this, "Por favor ingrese el nombre del hogar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("NOMBRE", nombre.toString())
+        intent.putExtra("COLOR", color)
+        intent.putExtra("EDIT", edit)
+        startActivity(intent)
     }
 
 }

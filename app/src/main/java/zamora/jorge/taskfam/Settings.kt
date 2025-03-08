@@ -3,6 +3,8 @@ package zamora.jorge.taskfam
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +26,7 @@ class Settings : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
-         override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
@@ -33,6 +35,14 @@ class Settings : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+             //TODO: Traer datos (codigo, nombre de la casa, miembros, rol del usuario)
+
+            //TODO: Colocar datos en los campos
+
+            //TODO: Colocar los miembros en la lista
+
+            //TODO: Si el usuario no es creador del hogar, no dejarle editar nada
+
              binding = ActivitySettingsBinding.inflate(layoutInflater)
              setContentView(binding.root)
 
@@ -45,7 +55,32 @@ class Settings : AppCompatActivity() {
                  val intent = Intent(this, Login::class.java)
                  startActivity(intent)
              }
+
+        binding.etNombreHogar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No es necesario implementar este método
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // No es necesario implementar este método
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                guardarNombre(s.toString())
+            }
+        })
              colocarDatosEjemplo()
+    }
+
+    fun guardarNombre(texto: String) {
+        //Comprobar que no esté vacío
+        if (texto.isEmpty()) {
+            Toast.makeText(this, "Por favor ingrese un nombre", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        //TODO: Guardar el nombre del hogar en la base de datos
+        Toast.makeText(this, "Texto actualizado: $texto", Toast.LENGTH_SHORT).show()
     }
 
     fun colocarDatosEjemplo(){
@@ -62,6 +97,7 @@ class Settings : AppCompatActivity() {
         listView.adapter = adapter
     }
 
+    //TODO: USAR LA DATA CLASS DE MEMBER EN VEZ DE ESTA
     data class Miembro(val nombre: String, var puedeEditar: Boolean)
 
     class MiembroAdapter(private val context: Context, private val data: List<Miembro>) : BaseAdapter() {

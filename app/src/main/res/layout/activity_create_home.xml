@@ -29,7 +29,7 @@
         android:layout_marginBottom="80dp" />
 
     <EditText
-        android:id="@+id/etNombreTarea"
+        android:id="@+id/etNombreHogar"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:hint="Nombre del hogar"

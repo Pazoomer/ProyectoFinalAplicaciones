@@ -16,5 +16,9 @@ class TaskDetail : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        //TODO: RECIBIR DATOS DEL INTENT
+
+        //TODO: COLOCARLE LOS DATOS A LAS VISTAS
     }
 }

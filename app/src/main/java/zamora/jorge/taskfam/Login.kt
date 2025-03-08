@@ -45,9 +45,15 @@ class Login : AppCompatActivity() {
         val correo=binding.etCorreo
         val contrasena=binding.etContrasena
 
-        //Validar datos
-        if(correo.text.toString().isEmpty() || contrasena.text.toString().isEmpty()) {
-            Toast.makeText(this, "Por favor ingrese sus datos", Toast.LENGTH_SHORT).show()
+        // Validar campos vacíos
+        if ( correo.text.isEmpty() || contrasena.text.isEmpty()) {
+            Toast.makeText(this, "Por favor ingrese todos sus datos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar correo
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo.text).matches()) {
+            Toast.makeText(this, "Correo inválido", Toast.LENGTH_SHORT).show()
             return
         }
 

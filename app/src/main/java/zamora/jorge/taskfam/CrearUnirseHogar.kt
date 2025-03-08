@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import zamora.jorge.taskfam.data.Casa
 import zamora.jorge.taskfam.databinding.ActivityCrearUnirseHogarBinding
 
 
@@ -25,6 +26,14 @@ class CrearUnirseHogar : AppCompatActivity() {
 
         binding = ActivityCrearUnirseHogarBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //Obtener datos del intent
+        val correo = intent.getStringExtra("correo")
+        //TODO: HACER UNA CONSULTA A LA BASE DE DATOS PARA SABER SI EL USUARIO TIENE UN HOGAR
+
+        //TODO: SI TIENE UN HOGAR, MOSTRARLO EN EL GRIDVIEW
+
+        //TODO: SI NO TIENE UN HOGAR, MOSTRAR LOS DOS BOTONES EN GRANDE
 
         llenarListaCasas()
 

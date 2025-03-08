@@ -2,6 +2,7 @@ package zamora.jorge.taskfam
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,15 +26,24 @@ class JoinHouse : AppCompatActivity() {
         }
 
         binding.btnAdd.setOnClickListener(){
-            if (validarCampo()){
-                startActivity(Intent(this, MainActivity::class.java))
-            }
+            joinHouse()
         }
     }
 
-    fun validarCampo(): Boolean{
+    fun joinHouse(){
+        //Obtener datos
+        val codigo=binding.inputCode
 
-        return !binding.inputCode.text.toString().isBlank()
+        // Validar campos vacíos
+        if ( codigo.text.isEmpty()) {
+            Toast.makeText(this, "Ingrese el codigo del hogar", Toast.LENGTH_SHORT).show()
+            return
+        }
 
+        //TODO: BUSCAR EN LA BASE DE DATOS UN HOGAR CON ESE CODIGO
+
+        startActivity(Intent(this, MainActivity::class.java))
+        intent.putExtra("CODIGO", codigo.text.toString())
+        startActivity(intent)
     }
 }
