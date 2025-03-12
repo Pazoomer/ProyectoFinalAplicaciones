@@ -16,7 +16,7 @@
         android:textSize="50sp"
         android:textStyle="bold"
         android:layout_gravity="center"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="80dp"
         android:layout_marginBottom="8dp" />
 
     <TextView
@@ -29,7 +29,7 @@
         android:gravity="center"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
-        android:layout_marginBottom="40dp" />
+        android:layout_marginBottom="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
             android:id="@+id/ivRole"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/people"
+            android:src="@drawable/person_svg"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
@@ -72,7 +72,7 @@
             android:id="@+id/ivEmail"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/email"
+            android:src="@drawable/email_svg"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
@@ -101,7 +101,7 @@
             android:id="@+id/ivPassword"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/password"
+            android:src="@drawable/lock_svg"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
@@ -112,6 +112,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:paddingStart="16dp"
+        android:inputType="textPassword"
         android:background="@drawable/background_blue_sky"
         app:cornerRadius="20dp"/>
     </LinearLayout>
@@ -129,7 +130,7 @@
             android:id="@+id/ivConfirmPassword"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/password"
+            android:src="@drawable/lock_svg"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
@@ -152,7 +153,6 @@
         android:textSize="20sp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
-        android:layout_marginBottom="16dp"
         android:backgroundTint="@color/blue_brilliant"
         app:cornerRadius="20dp"
         android:text="@string/register" />

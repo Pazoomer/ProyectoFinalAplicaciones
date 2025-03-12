@@ -12,7 +12,7 @@
         android:id="@+id/ivBackArrow"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/back_arrow"
+        android:src="@drawable/back_arrow_svg"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
 
@@ -52,9 +52,10 @@
             android:id="@+id/ivHouseIcon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/house"
+            android:src="@drawable/house_svg"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginLeft="10dp"
+            app:tint="@color/gray_light" />
         <EditText
             android:id="@+id/etNombreHogar"
             android:layout_width="match_parent"
@@ -88,7 +89,7 @@
                 android:id="@+id/ivRoleIcon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/people"
+                android:src="@drawable/person_svg"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp" />
         <EditText
