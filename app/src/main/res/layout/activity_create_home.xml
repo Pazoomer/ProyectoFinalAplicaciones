@@ -13,7 +13,7 @@
         android:id="@+id/ivBackArrow"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/back_arrow_g"
+        android:src="@drawable/back_arrow_svg"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="10dp" />
 
@@ -35,7 +35,7 @@
         android:hint=" Nombre del hogar"
         android:textSize="23sp"
         android:textStyle="bold"
-        android:drawableStart="@drawable/home"
+        android:drawableStart="@drawable/house_svg"
         android:paddingStart="16dp"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="30dp"

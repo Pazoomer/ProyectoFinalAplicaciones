@@ -31,7 +31,7 @@ class AddEdit : AppCompatActivity() {
         //TODO: Obtener lista de miembros de la base de datos
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listaNombres)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.sSeleccionMiembro.adapter = spinnerAdapter
+        binding.lvMiembros.adapter = spinnerAdapter
 
         // Configurar el ListView con el adapter
         adapter = MiembroAdapter(this, listaMiembros)
@@ -56,7 +56,7 @@ class AddEdit : AppCompatActivity() {
         }
     }
     private fun agregarHabitante() {
-        val nombreSeleccionado = binding.sSeleccionMiembro.selectedItem.toString()
+        val nombreSeleccionado = binding.lvMiembros.selectedItem.toString()
 
         if (nombreSeleccionado.isNotEmpty()) {
             if(!listaMiembros.any { it.name == nombreSeleccionado }){
@@ -109,9 +109,9 @@ class MiembroAdapter(context: Context, private val miembros: List<Member>) :
         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_member, parent, false)
 
         val miembro = miembros[position]
-        val tvAsignarDiasA = view.findViewById<TextView>(R.id.tvAsignarDiasA)
+        //val tvAsignarDiasA = view.findViewById<TextView>(R.id.tvAsignarDiasA)
 
-        tvAsignarDiasA.text = "Asignar a ${miembro.name} los días:"
+        //tvAsignarDiasA.text = "Asignar a ${miembro.name} los días:"
 
         return view
     }
