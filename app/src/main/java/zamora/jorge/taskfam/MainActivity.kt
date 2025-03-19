@@ -59,10 +59,10 @@ class MainActivity : AppCompatActivity() {
     private fun llenarListaDias() {
         listaDias.add(Day("Lunes", listOf(
             Task("Cocinar", "Tienes que limpiar bien", "Chuy"),
-            Task("Cocinar2", "Tienes que limpiar bien", "Chuy")
-            //Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            //Task("Lavar platos", "No olvides los vasos", "Abel"),
-            //Task("sip", "No olvides los vasos", "Juanito")
+            Task("Cocinar2", "Tienes que limpiar bien", "Chuy"),
+            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
+            Task("Lavar platos", "No olvides los vasos", "Abel"),
+            Task("sip", "No olvides los vasos", "Juanito")
         ), false))
 
         listaDias.add(Day("Martes", listOf(

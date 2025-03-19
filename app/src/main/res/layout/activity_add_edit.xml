@@ -8,6 +8,7 @@
     tools:context=".AddEdit">
 
     <ScrollView
+        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -21,9 +22,10 @@
 
             <ImageView
                 android:id="@+id/ivBackArrow"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/back_arrow_svg"
+
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/back_arrow_g"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp" />
 
@@ -44,7 +46,7 @@
                 android:hint=" Nombre de la tarea"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:drawableStart="@drawable/baseline_text_format_24"
+                android:drawableStart="@drawable/rename"
                 android:paddingStart="16dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/background_blue_sky"
@@ -55,24 +57,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
                 android:textSize="20sp"
-                android:hint=" Descripción breve"
+                android:hint="  Descripción breve"
                 android:textStyle="bold"
-                android:drawableStart="@drawable/baseline_notes_24"
+                android:drawableStart="@drawable/desc"
                 android:paddingStart="16dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/background_blue_sky"
                 app:cornerRadius="20dp"/>
-
-            <TextView
-                android:id="@+id/tvSeleccion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Seleccione los habitantes que se\n harán cargo"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textAlignment="center"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -80,10 +71,16 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <Spinner
-                    android:id="@+id/sSeleccionMiembro"
-                    android:layout_width="227dp"
-                    android:layout_height="52dp" />
+                <TextView
+                    android:id="@+id/tvSeleccion"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Agregar un miembro a la tarea"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp" />
 
                 <Button
                     android:id="@+id/btnAgregarHabitante"
