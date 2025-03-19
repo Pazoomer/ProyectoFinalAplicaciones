@@ -41,6 +41,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.btnBack.setOnClickListener {
+            val intent = Intent(this, CrearUnirseHogar::class.java)
+            startActivity(intent)
+        }
+
         binding.addTask.setOnClickListener {
             val intent = Intent(this, AddEdit::class.java)
             startActivity(intent)

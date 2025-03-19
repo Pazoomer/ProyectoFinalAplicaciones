@@ -10,10 +10,11 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import zamora.jorge.taskfam.data.Casa
 import zamora.jorge.taskfam.databinding.ActivityCrearUnirseHogarBinding
-
-
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class CrearUnirseHogar : AppCompatActivity() {
 
@@ -65,6 +66,7 @@ class CrearUnirseHogar : AppCompatActivity() {
         }
 
         binding.btnCerrarSesion.setOnClickListener{
+            Firebase.auth.signOut()
             startActivity(Intent(this,Login::class.java))
         }
     }
