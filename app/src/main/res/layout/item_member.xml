@@ -5,15 +5,10 @@
     android:orientation="vertical"
     android:elevation="4dp">
 
-    <TextView
-        android:id="@+id/tvAsignarDiasA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Asignar a Beto los días:"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/darker_gray"
-        android:layout_gravity="center_horizontal" />
+    <Spinner
+        android:id="@+id/sSeleccionMiembro"
+        android:layout_width="match_parent"
+        android:layout_height="52dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -11,10 +11,10 @@
 
     <ImageView
         android:id="@+id/ivBackArrow"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/back_arrow"
-        android:layout_marginTop="10dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/back_arrow_g"
+        android:layout_marginTop="50dp"
         android:layout_marginLeft="10dp" />
 
     <TextView
@@ -32,10 +32,10 @@
         android:id="@+id/etNombreHogar"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:hint="Nombre del hogar"
-        android:textSize="20sp"
+        android:hint=" Nombre del hogar"
+        android:textSize="23sp"
         android:textStyle="bold"
-        android:drawableStart="@drawable/baseline_text_format_24"
+        android:drawableStart="@drawable/home"
         android:paddingStart="16dp"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="30dp"
