@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "753405350151",
+    "project_id": "taskfam-7131a",
+    "storage_bucket": "taskfam-7131a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753405350151:android:0c49df42d6515cc06275a2",
+        "android_client_info": {
+          "package_name": "zamora.jorge.taskfam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9G3NcqlvLt_FACBQozmWKYKfFuT75tV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

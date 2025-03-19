@@ -12,7 +12,7 @@
         android:id="@+id/btnBack"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/back_arrow"
+        android:src="@drawable/back_arrow_svg"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
 

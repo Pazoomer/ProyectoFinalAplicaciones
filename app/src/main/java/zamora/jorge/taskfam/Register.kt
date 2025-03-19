@@ -6,13 +6,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.content.Intent
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import zamora.jorge.taskfam.databinding.ActivityRegisterBinding
 import java.security.Principal
+import com.google.firebase.auth.auth
+import com.google.firebase.Firebase
 
 class Register : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +39,33 @@ class Register : AppCompatActivity() {
         }
 
         binding.btnRegistrarse.setOnClickListener {
-            registrarse()
+            //registrarse()
         }
+
+
+        auth = Firebase.auth
+        val nombre: EditText =findViewById(R.id.etNombre)
+        val email: EditText =findViewById(R.id.etCorreo)
+        val password: EditText =findViewById(R.id.etContrasena)
+        val confirmPassword: EditText =findViewById(R.id.etConfirmarContrasena)
+        val error: TextView =findViewById(R.id.tvSubtitulo)
+        val button: Button =findViewById(R.id.btnRegistrarse)
+
+        error.visibility= View.INVISIBLE
+
+        button.setOnClickListener{
+            if(email.text.isEmpty()||password.text.isEmpty()||confirmPassword.text.isEmpty()){
+                error.text="Por favor ingrese todos los campos"
+                error.visibility= View.VISIBLE
+            }else if(password.text.toString()!=confirmPassword.text.toString()){
+                error.text="Las contraseñas no coinciden"
+                error.visibility= View.VISIBLE
+            }else{
+                error.visibility= View.INVISIBLE
+                sigIn(email.text.toString(),password.text.toString())
+            }
+        }
+
     }
 
     fun yaTienesCuenta() {
@@ -79,4 +112,17 @@ class Register : AppCompatActivity() {
         intent.putExtra("correo", correo.text.toString())
         startActivity(intent)
     }
+
+    private fun sigIn(email: String, password: String){
+        auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this){task->
+            if(task.isSuccessful){
+                val user=auth.currentUser
+                val intent= Intent(this,MainActivity::class.java)
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }else{
+                Toast.makeText(baseContext, "El registro fallo", Toast.LENGTH_SHORT).show()
+            }
+        }
+}
 }

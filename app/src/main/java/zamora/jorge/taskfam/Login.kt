@@ -2,16 +2,25 @@ package zamora.jorge.taskfam
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import zamora.jorge.taskfam.databinding.ActivityLoginBinding
 
 class Login : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +40,32 @@ class Login : AppCompatActivity() {
         }
 
         binding.btnIniciarSesion.setOnClickListener {
-            iniciarSesion()
+            //iniciarSesion()
         }
+        auth = Firebase.auth
+        val email: EditText =findViewById(R.id.etCorreo)
+        val password: EditText =findViewById(R.id.etContrasena)
+        val error: TextView =findViewById(R.id.tvSubtitulo)
+        val buttonLogin: Button =findViewById(R.id.btnIniciarSesion)
+        //val buttonRegister: TextView =findViewById(R.id.tvNoTienesCuenta)
+
+        error.visibility= View.INVISIBLE
+
+        buttonLogin.setOnClickListener{
+            if(email.text.isEmpty()||password.text.isEmpty()){
+                error.text="Por favor ingrese todos los campos"
+                error.visibility=View.VISIBLE
+            }else{
+                error.visibility=View.INVISIBLE
+                login(email.text.toString(),password.text.toString())
+            }
+        }
+        /*
+        buttonRegister.setOnClickListener{
+            val intent: Intent = Intent(this,SignInActivity::class.java)
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }*/
     }
 
     fun noTienesCuenta() {
@@ -63,5 +96,41 @@ class Login : AppCompatActivity() {
         val intent = Intent(this, CrearUnirseHogar::class.java)
         intent.putExtra("correo", correo.text.toString())
         startActivity(intent)
+    }
+
+    public override fun onStart()
+    {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            goToMain(currentUser)
+        }
+    }
+
+    fun login (email: String, password: String){
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this){task->
+            if(task.isSuccessful){
+                val user=auth.currentUser
+                showError(visible=false)
+                goToMain(user!!)
+            }else{
+                showError(text="Usuario o contraseña incorrectos",visible=true)
+            }
+        }
+    }
+
+    private fun goToMain(user: FirebaseUser){
+        val intent: Intent = Intent(this,MainActivity::class.java)
+        intent.putExtra("user",user.email)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    }
+
+    private fun showError(text: String="", visible: Boolean){
+        val error: TextView =findViewById(R.id.tvSubtitulo)
+
+        error.text=text
+
+        error.visibility= if(visible) View.VISIBLE else View.INVISIBLE
     }
 }
