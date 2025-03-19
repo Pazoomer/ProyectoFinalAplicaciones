@@ -42,7 +42,7 @@ class JoinHouse : AppCompatActivity() {
 
         //TODO: BUSCAR EN LA BASE DE DATOS UN HOGAR CON ESE CODIGO
 
-        startActivity(Intent(this, MainActivity::class.java))
+        val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("CODIGO", codigo.text.toString())
         startActivity(intent)
     }

@@ -118,7 +118,7 @@ class Register : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this){task->
             if(task.isSuccessful){
                 val user=auth.currentUser
-                val intent= Intent(this,MainActivity::class.java)
+                val intent= Intent(this,CrearUnirseHogar::class.java)
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }else{

@@ -107,20 +107,22 @@ class Login : AppCompatActivity() {
         }
     }
 
-    fun login (email: String, password: String){
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this){task->
-            if(task.isSuccessful){
-                val user=auth.currentUser
-                showError(visible=false)
-                goToMain(user!!)
-            }else{
-                showError(text="Usuario o contraseña incorrectos",visible=true)
+    fun login(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    showError(visible = false)
+                    goToMain(user!!)
+                } else {
+                    val errorMessage = task.exception?.message ?: "Error desconocido"
+                    showError(text = errorMessage, visible = true)
+                }
             }
-        }
     }
 
     private fun goToMain(user: FirebaseUser){
-        val intent: Intent = Intent(this,MainActivity::class.java)
+        val intent: Intent = Intent(this,CrearUnirseHogar::class.java)
         intent.putExtra("user",user.email)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
