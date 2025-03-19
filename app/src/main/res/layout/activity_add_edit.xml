@@ -8,7 +8,7 @@
     tools:context=".AddEdit">
 
     <ScrollView
-        android:layout_marginTop="30dp"
+        android:paddingTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
