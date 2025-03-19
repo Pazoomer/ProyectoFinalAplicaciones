@@ -28,12 +28,6 @@ class AddEdit : AppCompatActivity() {
         binding = ActivityAddEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializar el Spinner con la lista de nombres
-        //TODO: Obtener lista de miembros de la base de datos
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listaNombres)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.lvMiembros.adapter = spinnerAdapter
-
         // Configurar el ListView con el adapter
         adapter = MiembroAdapter(this, listaMiembros, listaNombres)
         binding.lvMiembros.adapter = adapter
@@ -58,25 +52,10 @@ class AddEdit : AppCompatActivity() {
     }
 
     private fun agregarHabitante() {
-        val nombreSeleccionado = binding.lvMiembros.selectedItem.toString()
-
-        if (nombreSeleccionado.isNotEmpty()) {
-            if(!listaMiembros.any { it.name == nombreSeleccionado }){
-                val nuevoMiembro = Member(nombreSeleccionado)
-                listaMiembros.add(nuevoMiembro)
-                adapter.notifyDataSetChanged() // Refrescar la lista
-            }else{
-                Toast.makeText(this, "El miembro ya se encuentra en la lista", Toast.LENGTH_SHORT).show()
-            }
-        }else{
-            Toast.makeText(this, "Por favor seleccione un miembro", Toast.LENGTH_SHORT).show()
-        }
-
         // Agregar un nuevo miembro vacío a la lista
-        //val nuevoMiembro = Member("Selecciona un nombre")
-        //listaMiembros.add(nuevoMiembro)
-        //adapter.notifyDataSetChanged() // Refrescar la lista
-
+        val nuevoMiembro = Member("Selecciona un nombre")
+        listaMiembros.add(nuevoMiembro)
+        adapter.notifyDataSetChanged() // Refrescar la lista
     }
 
     private fun agregarEditar() {
@@ -123,8 +102,11 @@ class MiembroAdapter(
         }
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                miembros[position].name = listaNombres[position]
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, selectedIndex: Int, id: Long) {
+                // Asegurar que no haya IndexOutOfBoundsException
+                if (position < miembros.size) {
+                    miembros[position].name = listaNombres[selectedIndex]
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
