@@ -1,20 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_blue_sky"
     android:padding="20dp"
     tools:context=".CrearUnirseHogar">
 
 
     <TextView
+        android:paddingTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Home"
+        android:text="Hogar"
         android:textSize="46sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
@@ -88,7 +117,7 @@
 
     </LinearLayout>
 
-    <GridView
+    <ListView
         android:id="@+id/lista_casas"
         android:layout_width="match_parent"
         android:layout_height="4dp"
@@ -162,8 +191,8 @@
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Nueva casa"
-                android:textSize="13sp"
+                android:text="Unirse a hogar"
+                android:textSize="11sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"/>
         </LinearLayout>
