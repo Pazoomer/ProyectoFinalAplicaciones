@@ -20,13 +20,13 @@
 
             <TextView
                 android:id="@+id/tv_dia"
-                android:layout_width="150dp"
+                android:layout_width="130dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_day"
                 android:gravity="center"
                 android:text="Lunes"
                 android:textColor="@color/white"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:layout_marginRight="20dp" />
 
             <ProgressBar
