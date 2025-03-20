@@ -26,6 +26,7 @@ import zamora.jorge.taskfam.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val listaDias = mutableListOf<Day>()
+    private var mostrarSoloHoy = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +41,23 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        llenarListaDias()
+        val dayAdapter = DayAdapter(this, listaDias)
+        binding.lvDias.adapter = dayAdapter
+
+
+        binding.switchOnOff.setOnCheckedChangeListener { _, isChecked ->
+            mostrarSoloHoy = isChecked
+            dayAdapter.updateList(getDiasMostrados())
+            if (isChecked) {
+                binding.tvSwitchSemanal.setTextColor(resources.getColor(android.R.color.black))
+                binding.tvSwitchHoy.setTextColor(resources.getColor(android.R.color.white))
+            } else {
+                binding.tvSwitchHoy.setTextColor(resources.getColor(android.R.color.black))
+                binding.tvSwitchSemanal.setTextColor(resources.getColor(android.R.color.white))
+            }
+        }
 
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, CrearUnirseHogar::class.java)
@@ -56,9 +74,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        llenarListaDias()
-        val dayAdapter = DayAdapter(this, listaDias)
-        binding.lvDias.adapter = dayAdapter
+
     }
 
     private fun llenarListaDias() {
@@ -66,8 +82,7 @@ class MainActivity : AppCompatActivity() {
             Task("Cocinar", "Tienes que limpiar bien", "Chuy"),
             Task("Cocinar2", "Tienes que limpiar bien", "Chuy"),
             Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-            Task("Lavar platos", "No olvides los vasos", "Abel"),
-            Task("sip", "No olvides los vasos", "Juanito")
+
         ), false))
 
         listaDias.add(Day("Martes", listOf(
@@ -76,7 +91,21 @@ class MainActivity : AppCompatActivity() {
         ), false))
     }
 
-    private class DayAdapter(private val context: Context, private val dias: List<Day>) : BaseAdapter() {
+    private fun getDiasMostrados(): List<Day> {
+        return if (mostrarSoloHoy) {
+            listaDias.take(1)
+        } else {
+            listaDias
+        }
+    }
+
+    private class DayAdapter(private val context: Context, private var dias: List<Day>) : BaseAdapter() {
+        //Lo estoy poniendo para que actualice los dias dependiendo el switch
+        fun updateList(newList: List<Day>) {
+            dias = newList
+            notifyDataSetChanged()
+        }
+
         override fun getCount(): Int = dias.size
         override fun getItem(position: Int): Any = dias[position]
         override fun getItemId(position: Int): Long = position.toLong()
