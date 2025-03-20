@@ -90,6 +90,12 @@ class MiembroAdapter(
 
         val miembro = miembros[position]
         val spinner = view.findViewById<Spinner>(R.id.sSeleccionMiembro)
+        val btnEliminar = view.findViewById<TextView>(R.id.tvEliminar)
+
+        btnEliminar.setOnClickListener {
+            miembros.removeAt(position)
+            notifyDataSetChanged()
+        }
 
         val spinnerAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, listaNombres)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
