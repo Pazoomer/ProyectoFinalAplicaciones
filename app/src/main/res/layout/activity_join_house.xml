@@ -55,7 +55,8 @@
                 android:gravity="center"
                 android:background="@drawable/background_edit_text_join"
                 android:padding="8dp"
-                android:inputType="number"/>
+                android:inputType="number"
+                android:maxLength="8"/>
 
             <LinearLayout
                 android:id="@+id/btnAdd"

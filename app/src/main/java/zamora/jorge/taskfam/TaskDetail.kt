@@ -23,7 +23,7 @@ class TaskDetail : AppCompatActivity() {
         binding = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.ivBackArrow.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }

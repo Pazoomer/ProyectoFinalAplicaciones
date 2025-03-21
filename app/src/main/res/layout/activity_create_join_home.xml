@@ -14,10 +14,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hogar"
-        android:textSize="46sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
         android:paddingBottom="16dp"/>
 
     <!-- Para los botones en caso que no haya casa -->
@@ -87,21 +88,24 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lista_casas"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:background="@drawable/rounded_button"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_weight="7.4"
-        android:horizontalSpacing="16dp"
-        android:numColumns="1"
-        android:padding="8dp"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="16dp"
-        android:visibility="visible"
-        android:choiceMode="singleChoice"/>
+        android:layout_height="600dp"
+        android:maxHeight="50dp"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/lista_casas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:padding="8dp"
+            android:stretchMode="columnWidth"
+            android:visibility="visible"
+            android:choiceMode="singleChoice"/>
+    </LinearLayout>
 
     <!-- Para los botones en caso que si haya casa -->
     <LinearLayout
@@ -109,6 +113,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="50dp"
         android:visibility="visible">
 
@@ -169,6 +174,11 @@
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
     <TextView
         android:id="@+id/btn_cerrar_sesion"
         android:layout_width="wrap_content"
@@ -177,6 +187,7 @@
         android:textColor="@android:color/black"
         android:textStyle="bold"
         android:padding="5dp"
+        android:layout_marginBottom="40dp"
         android:layout_gravity="center"
         android:clickable="true" />
 

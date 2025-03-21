@@ -8,14 +8,25 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     tools:context=".TaskDetail">
-    <ImageView
-        android:id="@+id/ivBackArrow"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/back_arrow_svg"
-        android:layout_marginTop="10dp"
-        android:layout_gravity="left"
-        android:layout_marginLeft="10dp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="45dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/back_arrow_svg"
+            android:layout_marginRight="270dp"
+            />
+
+
+    </LinearLayout>
 
     <TextView
         android:layout_marginTop="50dp"
@@ -89,7 +100,8 @@
                     android:id="@+id/cbLunes"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Martes -->
@@ -112,7 +124,8 @@
                     android:id="@+id/cbMartes"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Miércoles -->
@@ -135,7 +148,8 @@
                     android:id="@+id/cbMiercoles"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Jueves -->
@@ -158,7 +172,8 @@
                     android:id="@+id/cbJueves"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Viernes -->
@@ -181,7 +196,8 @@
                     android:id="@+id/cbViernes"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Sábado -->
@@ -204,7 +220,8 @@
                     android:id="@+id/cbSabado"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Domingo -->
@@ -227,7 +244,8 @@
                     android:id="@+id/cbDomingo"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -297,7 +315,8 @@
                     android:id="@+id/cbLunes2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Martes -->
@@ -320,7 +339,8 @@
                     android:id="@+id/cbMartes2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Miércoles -->
@@ -343,7 +363,8 @@
                     android:id="@+id/cbMiercoles2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Jueves -->
@@ -366,7 +387,8 @@
                     android:id="@+id/cbJueves2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Viernes -->
@@ -389,7 +411,8 @@
                     android:id="@+id/cbViernes2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Sábado -->
@@ -412,7 +435,8 @@
                     android:id="@+id/cbSabado2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
             <!-- Día Domingo -->
@@ -435,7 +459,8 @@
                     android:id="@+id/cbDomingo2"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:buttonTint="@color/black"/>
+                    android:buttonTint="@color/black"
+                    android:enabled="false"/>
             </LinearLayout>
 
         </LinearLayout>
