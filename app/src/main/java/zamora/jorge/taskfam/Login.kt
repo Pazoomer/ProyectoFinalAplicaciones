@@ -114,9 +114,13 @@ class Login : AppCompatActivity() {
                     val user = auth.currentUser
                     showError(visible = false)
                     goToMain(user!!)
-                } else {
+                }
+                else if (password.toString().length<6){
+                    showError(text = "La contraseña debe tener al menos 6 caracteres", visible = true)
+                }
+                else {
                     val errorMessage = task.exception?.message ?: "Error desconocido"
-                    showError(text = errorMessage, visible = true)
+                    showError(text = "Correo o contraseña incorrectas", visible = true)
                 }
             }
     }
@@ -131,7 +135,9 @@ class Login : AppCompatActivity() {
     private fun showError(text: String="", visible: Boolean){
         val error: TextView =findViewById(R.id.tvError)
 
-        error.text="Contraseña o correo incorrectos"
+
+
+        error.text=text
 
         error.visibility= if(visible) View.VISIBLE else View.INVISIBLE
     }

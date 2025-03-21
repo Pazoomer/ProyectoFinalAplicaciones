@@ -48,7 +48,7 @@ class Register : AppCompatActivity() {
         val email: EditText =findViewById(R.id.etCorreo)
         val password: EditText =findViewById(R.id.etContrasena)
         val confirmPassword: EditText =findViewById(R.id.etConfirmarContrasena)
-        val error: TextView =findViewById(R.id.tvSubtitulo)
+        val error: TextView =findViewById(R.id.tvError)
         val button: Button =findViewById(R.id.btnRegistrarse)
 
         error.visibility= View.INVISIBLE
