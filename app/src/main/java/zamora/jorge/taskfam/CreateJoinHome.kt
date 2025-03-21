@@ -23,7 +23,7 @@ class CreateJoinHome : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        window.statusBarColor = getColor(android.R.color.black)
         binding = ActivityCreateJoinHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

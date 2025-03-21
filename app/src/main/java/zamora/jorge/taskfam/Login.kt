@@ -45,7 +45,7 @@ class Login : AppCompatActivity() {
         auth = Firebase.auth
         val email: EditText =findViewById(R.id.etCorreo)
         val password: EditText =findViewById(R.id.etContrasena)
-        val error: TextView =findViewById(R.id.tvSubtitulo)
+        val error: TextView =findViewById(R.id.tvError)
         val buttonLogin: Button =findViewById(R.id.btnIniciarSesion)
         //val buttonRegister: TextView =findViewById(R.id.tvNoTienesCuenta)
 
@@ -129,9 +129,9 @@ class Login : AppCompatActivity() {
     }
 
     private fun showError(text: String="", visible: Boolean){
-        val error: TextView =findViewById(R.id.tvSubtitulo)
+        val error: TextView =findViewById(R.id.tvError)
 
-        error.text=text
+        error.text="Contraseña o correo incorrectos"
 
         error.visibility= if(visible) View.VISIBLE else View.INVISIBLE
     }
