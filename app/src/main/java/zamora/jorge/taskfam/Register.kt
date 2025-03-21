@@ -14,7 +14,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import zamora.jorge.taskfam.databinding.ActivityRegisterBinding
-import java.security.Principal
 import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
 
@@ -109,7 +108,7 @@ class Register : AppCompatActivity() {
         //TODO: Revisar credenciales repetidas en la base de datos y registrarlo si no es asi
 
         //Cambiar actividad
-        val intent = Intent(this, CrearUnirseHogar::class.java)
+        val intent = Intent(this, CreateJoinHome::class.java)
         intent.putExtra("correo", correo.text.toString())
         startActivity(intent)
     }
@@ -118,7 +117,7 @@ class Register : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this){task->
             if(task.isSuccessful){
                 val user=auth.currentUser
-                val intent= Intent(this,CrearUnirseHogar::class.java)
+                val intent= Intent(this,CreateJoinHome::class.java)
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }else{

@@ -10,22 +10,21 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
 import zamora.jorge.taskfam.data.Casa
-import zamora.jorge.taskfam.databinding.ActivityCrearUnirseHogarBinding
+import zamora.jorge.taskfam.databinding.ActivityCreateJoinHomeBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 
-class CrearUnirseHogar : AppCompatActivity() {
+class CreateJoinHome : AppCompatActivity() {
 
-    private lateinit var binding: ActivityCrearUnirseHogarBinding
+    private lateinit var binding: ActivityCreateJoinHomeBinding
     private lateinit var casaAdapter: CasaAdapter
     private val listaCasas = mutableListOf<Casa>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityCrearUnirseHogarBinding.inflate(layoutInflater)
+        binding = ActivityCreateJoinHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         //Obtener datos del intent

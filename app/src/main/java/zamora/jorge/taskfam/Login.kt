@@ -93,7 +93,7 @@ class Login : AppCompatActivity() {
         //TODO: Revisar credenciales en la base de datos
 
         //Cambiar actividad
-        val intent = Intent(this, CrearUnirseHogar::class.java)
+        val intent = Intent(this, CreateJoinHome::class.java)
         intent.putExtra("correo", correo.text.toString())
         startActivity(intent)
     }
@@ -122,7 +122,7 @@ class Login : AppCompatActivity() {
     }
 
     private fun goToMain(user: FirebaseUser){
-        val intent: Intent = Intent(this,CrearUnirseHogar::class.java)
+        val intent: Intent = Intent(this,CreateJoinHome::class.java)
         intent.putExtra("user",user.email)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

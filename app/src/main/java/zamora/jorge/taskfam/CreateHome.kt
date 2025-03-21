@@ -41,7 +41,7 @@ class CreateHome : AppCompatActivity() {
         }
 
         binding.ivBackArrow.setOnClickListener(){
-            val intent = Intent(this, CrearUnirseHogar::class.java)
+            val intent = Intent(this, CreateJoinHome::class.java)
             startActivity(intent)
         }
 

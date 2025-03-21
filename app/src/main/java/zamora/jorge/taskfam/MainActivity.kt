@@ -7,18 +7,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.get
 import zamora.jorge.taskfam.data.Day
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityMainBinding
@@ -60,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnBack.setOnClickListener {
-            val intent = Intent(this, CrearUnirseHogar::class.java)
+            val intent = Intent(this, CreateJoinHome::class.java)
             startActivity(intent)
         }
 

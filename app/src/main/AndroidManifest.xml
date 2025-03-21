@@ -25,7 +25,7 @@
             android:name=".AddEdit"
             android:exported="false" />
         <activity
-            android:name=".CrearUnirseHogar"
+            android:name=".CreateJoinHome"
             android:exported="false" />
         <activity
             android:name=".Settings"

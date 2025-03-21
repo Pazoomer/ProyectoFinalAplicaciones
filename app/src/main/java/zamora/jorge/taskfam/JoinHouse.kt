@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import zamora.jorge.taskfam.databinding.ActivityCrearUnirseHogarBinding
 import zamora.jorge.taskfam.databinding.ActivityJoinHouseBinding
 
 private lateinit var binding: ActivityJoinHouseBinding
@@ -22,7 +19,7 @@ class JoinHouse : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnBack.setOnClickListener(){
-            startActivity(Intent(this, CrearUnirseHogar::class.java))
+            startActivity(Intent(this, CreateJoinHome::class.java))
         }
 
         binding.btnAdd.setOnClickListener(){
