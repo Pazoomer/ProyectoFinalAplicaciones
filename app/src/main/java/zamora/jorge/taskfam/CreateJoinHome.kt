@@ -78,6 +78,18 @@ class CreateJoinHome : AppCompatActivity() {
             add(Casa("Casa CDMX"))
             add(Casa("Casa Cancún"))
             add(Casa("Casa Puebla"))
+            add(Casa("Casa Mochis"))
+            add(Casa("Casa Monterrey"))
+            add(Casa("Casa Guadalajara"))
+            add(Casa("Casa CDMX"))
+            add(Casa("Casa Cancún"))
+            add(Casa("Casa Puebla"))
+            add(Casa("Casa Mochis"))
+            add(Casa("Casa Monterrey"))
+            add(Casa("Casa Guadalajara"))
+            add(Casa("Casa CDMX"))
+            add(Casa("Casa Cancún"))
+            add(Casa("Casa Puebla"))
         }
     }
 

@@ -13,7 +13,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/back_arrow_svg"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="40dp"
         android:layout_marginLeft="10dp" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:textSize="50sp"
         android:textStyle="bold"
         android:layout_gravity="center"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="5dp"
         android:layout_marginBottom="8dp" />
 
     <TextView

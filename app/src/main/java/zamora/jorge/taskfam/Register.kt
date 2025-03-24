@@ -22,6 +22,7 @@ class Register : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,7 +49,7 @@ class Register : AppCompatActivity() {
         val email: EditText =findViewById(R.id.etCorreo)
         val password: EditText =findViewById(R.id.etContrasena)
         val confirmPassword: EditText =findViewById(R.id.etConfirmarContrasena)
-        val error: TextView =findViewById(R.id.tvError)
+        val error: TextView= findViewById(R.id.tvError)
         val button: Button =findViewById(R.id.btnRegistrarse)
 
         error.visibility= View.INVISIBLE
@@ -61,8 +62,7 @@ class Register : AppCompatActivity() {
                 error.text="Las contraseñas no coinciden"
                 error.visibility= View.VISIBLE
             }else{
-                error.visibility= View.INVISIBLE
-                sigIn(email.text.toString(),password.text.toString())
+                sigIn(email.text.toString(),password.text.toString(), error)
             }
         }
 
@@ -113,7 +113,7 @@ class Register : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun sigIn(email: String, password: String){
+    private fun sigIn(email: String, password: String, error:TextView){
         auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this){task->
             if(task.isSuccessful){
                 val user=auth.currentUser
@@ -121,8 +121,8 @@ class Register : AppCompatActivity() {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }else{
-                Toast.makeText(baseContext, "El registro fallo", Toast.LENGTH_SHORT).show()
-                Log.d("TAG", "createUserWithEmail:failure", task.exception)
+                error.text = "Ingrese datos válidos"
+                error.visibility= View.VISIBLE
             }
         }
 }
