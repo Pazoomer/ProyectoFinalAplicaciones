@@ -2,6 +2,7 @@ package zamora.jorge.taskfam
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -26,6 +27,7 @@ class CreateHome : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        window.statusBarColor = Color.BLACK
 
         defaultColor = ContextCompat.getColor(this, R.color.blue_brilliant)
 

@@ -2,6 +2,8 @@ package zamora.jorge.taskfam
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +28,8 @@ class CreateJoinHome : AppCompatActivity() {
         window.statusBarColor = getColor(android.R.color.black)
         binding = ActivityCreateJoinHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        window.statusBarColor = Color.BLACK
 
         //Obtener datos del intent
         val correo = intent.getStringExtra("correo")

@@ -2,6 +2,8 @@ package zamora.jorge.taskfam
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +26,8 @@ class AddEdit : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.statusBarColor = Color.BLACK
 
         binding = ActivityAddEditBinding.inflate(layoutInflater)
         setContentView(binding.root)

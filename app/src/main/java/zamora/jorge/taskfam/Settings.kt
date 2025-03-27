@@ -2,6 +2,8 @@ package zamora.jorge.taskfam
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -35,6 +37,9 @@ class Settings : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        window.statusBarColor = Color.BLACK
+
              //TODO: Traer datos (codigo, nombre de la casa, miembros, rol del usuario)
 
             //TODO: Colocar datos en los campos
