@@ -10,13 +10,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import yuku.ambilwarna.AmbilWarnaDialog
+import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.databinding.ActivityCreateHomeBinding
 
 class CreateHome : AppCompatActivity() {
 
     private var defaultColor: Int = Color.WHITE
     private lateinit var binding: ActivityCreateHomeBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +31,9 @@ class CreateHome : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        auth = FirebaseAuth.getInstance()
+
         window.statusBarColor = Color.BLACK
 
         defaultColor = ContextCompat.getColor(this, R.color.blue_brilliant)
@@ -63,23 +70,84 @@ class CreateHome : AppCompatActivity() {
         ambilWarnaDialog.show()
     }
 
-    private fun createHome(){
-        //Obtener datos
-        val nombre=binding.etNombreHogar.text
-        val color=binding.btnSeleccionColor.solidColor
-        val edit=binding.rbEdit.isSelected
+    private fun createHome() {
+        val nombre = binding.etNombreHogar.text.toString().trim()
+        val color = defaultColor
+        val edit = binding.rbEdit.isChecked
 
-        // Validar campos vacíos
         if (nombre.isEmpty()) {
-            Toast.makeText(this, "Por favor ingrese el nombre del hogar", Toast.LENGTH_SHORT).show()
+            showError("Por favor ingrese el nombre del hogar")
             return
         }
 
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("NOMBRE", nombre.toString())
-        intent.putExtra("COLOR", color)
-        intent.putExtra("EDIT", edit)
-        startActivity(intent)
+        val userId = auth.currentUser?.uid ?: run {
+            showError("Error: Usuario no autenticado")
+            return
+        }
+
+        // Primero se intenta crear el codigo unico del hogar
+        generarCodigoUnico { codigoGenerado ->
+            val database = FirebaseDatabase.getInstance().reference.child("homes")
+            val homeId = database.push().key
+
+            if (homeId == null) {
+                return@generarCodigoUnico
+            }
+
+            val nuevaCasa = Home(
+                id = homeId,
+                nombre = nombre,
+                code = codigoGenerado,
+                color = color,
+                editable = edit,
+                members = listOf(userId) // El creador por el momento, de la creaciom
+            )
+
+            database.child(homeId).setValue(nuevaCasa)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Hogar creado exitosamente", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, CreateJoinHome::class.java))
+                }
+                .addOnFailureListener { e ->
+                    showError("Error al crear el hogar: ${e.message}")
+                }
+        }
     }
 
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        println("Error: $message")
+    }
+
+    fun generarCodigoUnico(callback: (String) -> Unit) {
+        val database = FirebaseDatabase.getInstance().reference.child("homes")
+        val caracteres = "0123456789"
+
+        fun intentarGenerarCodigo() {
+            val codigo = (1..7).map { caracteres.random() }.joinToString("")
+
+            database.get().addOnSuccessListener { snapshot ->
+                if (!snapshot.exists()) { // Este en caso de que noe existiera la coleccion
+                    callback(codigo)
+                    return@addOnSuccessListener
+                }
+
+                database.orderByChild("code").equalTo(codigo).get()
+                    .addOnSuccessListener { result ->
+                        if (result.exists()) {
+                            intentarGenerarCodigo() // ya existe, entonces vuelve a intentar
+                        } else {
+                            callback(codigo)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        intentarGenerarCodigo() // Se vuelve a intentar, en caso de error  codigo
+                    }
+            }.addOnFailureListener { e ->
+                intentarGenerarCodigo() // Se vuelve a intentar si no se pudo
+            }
+        }
+
+        intentarGenerarCodigo()
+    }
 }
