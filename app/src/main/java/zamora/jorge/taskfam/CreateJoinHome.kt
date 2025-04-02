@@ -12,7 +12,7 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import zamora.jorge.taskfam.data.Casa
+import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.databinding.ActivityCreateJoinHomeBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -21,7 +21,7 @@ class CreateJoinHome : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateJoinHomeBinding
     private lateinit var casaAdapter: CasaAdapter
-    private val listaCasas = mutableListOf<Casa>()
+    private val listaCasas = mutableListOf<Home>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +39,7 @@ class CreateJoinHome : AppCompatActivity() {
 
         //TODO: SI NO TIENE UN HOGAR, MOSTRAR LOS DOS BOTONES EN GRANDE
 
-        llenarListaCasas()
+//        llenarListaCasas()
 
         casaAdapter = CasaAdapter(this, listaCasas)
         binding.listaCasas.adapter = casaAdapter
@@ -74,30 +74,30 @@ class CreateJoinHome : AppCompatActivity() {
         }
     }
 
-    private fun llenarListaCasas() {
-        listaCasas.apply {
-            add(Casa("Casa Mochis"))
-            add(Casa("Casa Monterrey"))
-            add(Casa("Casa Guadalajara"))
-            add(Casa("Casa CDMX"))
-            add(Casa("Casa Cancún"))
-            add(Casa("Casa Puebla"))
-            add(Casa("Casa Mochis"))
-            add(Casa("Casa Monterrey"))
-            add(Casa("Casa Guadalajara"))
-            add(Casa("Casa CDMX"))
-            add(Casa("Casa Cancún"))
-            add(Casa("Casa Puebla"))
-            add(Casa("Casa Mochis"))
-            add(Casa("Casa Monterrey"))
-            add(Casa("Casa Guadalajara"))
-            add(Casa("Casa CDMX"))
-            add(Casa("Casa Cancún"))
-            add(Casa("Casa Puebla"))
-        }
-    }
+//    private fun llenarListaCasas() {
+//        listaCasas.apply {
+//            add(Home("Casa Mochis"))
+//            add(Casa("Casa Monterrey"))
+//            add(Casa("Casa Guadalajara"))
+//            add(Casa("Casa CDMX"))
+//            add(Casa("Casa Cancún"))
+//            add(Casa("Casa Puebla"))
+//            add(Casa("Casa Mochis"))
+//            add(Casa("Casa Monterrey"))
+//            add(Casa("Casa Guadalajara"))
+//            add(Casa("Casa CDMX"))
+//            add(Casa("Casa Cancún"))
+//            add(Casa("Casa Puebla"))
+//            add(Casa("Casa Mochis"))
+//            add(Casa("Casa Monterrey"))
+//            add(Casa("Casa Guadalajara"))
+//            add(Casa("Casa CDMX"))
+//            add(Casa("Casa Cancún"))
+//            add(Casa("Casa Puebla"))
+//        }
+//    }
 
-    inner class CasaAdapter(private val context: Context, private val casas: List<Casa>) : BaseAdapter() {
+    inner class CasaAdapter(private val context: Context, private val casas: List<Home>) : BaseAdapter() {
         override fun getCount(): Int = casas.size
         override fun getItem(position: Int): Any = casas[position]
         override fun getItemId(position: Int): Long = position.toLong()

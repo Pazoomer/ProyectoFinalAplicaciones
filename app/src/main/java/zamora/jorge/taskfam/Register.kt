@@ -18,6 +18,8 @@ import com.google.firebase.auth.FirebaseAuth
 import zamora.jorge.taskfam.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
+import com.google.firebase.database.FirebaseDatabase
+import zamora.jorge.taskfam.data.Member
 
 class Register : AppCompatActivity() {
 
@@ -67,7 +69,7 @@ class Register : AppCompatActivity() {
                 error.text="Las contraseñas no coinciden"
                 error.visibility= View.VISIBLE
             }else{
-                sigIn(email.text.toString(),password.text.toString(), error)
+                sigIn(email.text.toString(),password.text.toString(), nombre.text.toString(), error)
             }
         }
 
@@ -118,17 +120,31 @@ class Register : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun sigIn(email: String, password: String, error:TextView){
-        auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this){task->
-            if(task.isSuccessful){
-                val user=auth.currentUser
-                val intent= Intent(this,CreateJoinHome::class.java)
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            }else{
+    private fun sigIn(email: String, password: String, name: String, error: TextView) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                val user = auth.currentUser
+                user?.let {
+                    val uid = user.uid
+                    val member = Member(id = uid, name = name, email = email)
+
+                    val database = FirebaseDatabase.getInstance().reference
+                    database.child("members").child(uid).setValue(member)
+                        .addOnSuccessListener {
+                            val intent = Intent(this, CreateJoinHome::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        .addOnFailureListener {
+                            error.text = "Error al guardar los datos"
+                            error.visibility = View.VISIBLE
+                        }
+                }
+            } else {
                 error.text = "Ingrese datos válidos"
-                error.visibility= View.VISIBLE
+                error.visibility = View.VISIBLE
             }
         }
-}
+    }
+
 }

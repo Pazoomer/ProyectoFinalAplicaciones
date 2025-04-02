@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        llenarListaDias()
+//        llenarListaDias()
         val dayAdapter = DayAdapter(this, listaDias)
         binding.lvDias.adapter = dayAdapter
 
@@ -80,19 +80,19 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun llenarListaDias() {
-        listaDias.add(Day("Lunes", listOf(
-            Task("Cocinar", "Tienes que limpiar bien", "Chuy"),
-            Task("Cocinar2", "Tienes que limpiar bien", "Chuy"),
-            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-
-        ), false))
-
-        listaDias.add(Day("Martes", listOf(
-            Task("Sacar la basura", "Hoy es día de recolección", "Maria"),
-            Task("Sacar la basura2", "Hoy es día de recolección", "Maria")
-        ), false))
-    }
+//    private fun llenarListaDias() {
+//        listaDias.add(Day("Lunes", listOf(
+//            Task("Cocinar", "Tienes que limpiar bien", "Chuy"),
+//            Task("Cocinar2", "Tienes que limpiar bien", "Chuy"),
+//            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
+//
+//        ), false))
+//
+//        listaDias.add(Day("Martes", listOf(
+//            Task("Sacar la basura", "Hoy es día de recolección", "Maria"),
+//            Task("Sacar la basura2", "Hoy es día de recolección", "Maria")
+//        ), false))
+//    }
 
     private fun getDiasMostrados(): List<Day> {
         return if (mostrarSoloHoy) {
@@ -126,11 +126,11 @@ class MainActivity : AppCompatActivity() {
             progressBar.max = dia.tareas.size
             progressBar.progress = dia.tareas.count { false }
 
-            val tareaAdapter = TaskAdapter(context, dia.tareas)
+//            val tareaAdapter = TaskAdapter(context, dia.tareas)
             Log.d("DayAdapter", "TaskAdapter created with ${dia.tareas.size} items")
 
             val listViewTareas: ListView = view.findViewById(R.id.lv_tareas)
-            listViewTareas.adapter = tareaAdapter
+//            listViewTareas.adapter = tareaAdapter
             setListViewHeightBasedOnChildren(listViewTareas)
 
             return view
