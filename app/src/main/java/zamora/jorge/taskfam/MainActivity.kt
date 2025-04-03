@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import zamora.jorge.taskfam.data.Day
+import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityMainBinding
 
@@ -26,12 +27,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val listaDias = mutableListOf<Day>()
     private var mostrarSoloHoy = false
+    private var home: Home? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-
 
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -40,15 +40,16 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        home = intent.getParcelableExtra<Home>("HOME")
+
         window.statusBarColor = Color.BLACK
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        llenarListaDias()
+        //llenarListaDias()
         val dayAdapter = DayAdapter(this, listaDias)
         binding.lvDias.adapter = dayAdapter
-
 
         binding.switchOnOff.setOnCheckedChangeListener { _, isChecked ->
             mostrarSoloHoy = isChecked
@@ -74,6 +75,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.ivSettings.setOnClickListener {
             val intent = Intent(this, Settings::class.java)
+            intent.putExtra("HOME", home)
             startActivity(intent)
         }
 

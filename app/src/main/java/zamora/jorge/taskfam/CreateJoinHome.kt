@@ -31,7 +31,6 @@ class CreateJoinHome : AppCompatActivity() {
     private val listaCasas = mutableListOf<Home>()
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
-    var isFirstLoad = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,14 +50,15 @@ class CreateJoinHome : AppCompatActivity() {
         binding.listaCasas.adapter = casaAdapter
 
         // Manejar clic en los ítems del GridView
+        /*
         binding.listaCasas.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             val tvCasaNombre = view.findViewById<TextView>(R.id.tv_casa_nombre)
             val casaNombre = tvCasaNombre.text.toString()
 
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("CASA_NOMBRE", casaNombre)
+            intent.putExtra("HOME", home)
             startActivity(intent)
-        }
+        }*/
 
         // Configurar botones de navegación
         binding.btnCrearHogar.setOnClickListener {
@@ -80,16 +80,7 @@ class CreateJoinHome : AppCompatActivity() {
             finish()
         }
 
-        // Se ejecuta solo la primera vez
-        if (isFirstLoad) {
             obtenerCasasDeUsuario()
-            isFirstLoad = false
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        //obtenerCasasDeUsuario()
     }
 
     private fun obtenerCasasDeUsuario() {
@@ -165,6 +156,12 @@ class CreateJoinHome : AppCompatActivity() {
             val tvCasaNombre = view.findViewById<TextView>(R.id.tv_casa_nombre)
             tvCasaNombre.text = casas[position].nombre
 
+            view.setOnClickListener {
+                val home = casas[position]
+                val intent = Intent(context, MainActivity::class.java)
+                intent.putExtra("HOME", home)
+                context.startActivity(intent)
+            }
             return view
         }
     }
