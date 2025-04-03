@@ -7,6 +7,11 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import zamora.jorge.taskfam.databinding.ActivityJoinHouseBinding
 
 private lateinit var binding: ActivityJoinHouseBinding
@@ -21,29 +26,110 @@ class JoinHouse : AppCompatActivity() {
         binding = ActivityJoinHouseBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnBack.setOnClickListener(){
+        binding.btnBack.setOnClickListener() {
             startActivity(Intent(this, CreateJoinHome::class.java))
         }
 
-        binding.btnAdd.setOnClickListener(){
+        binding.btnAdd.setOnClickListener() {
             joinHouse()
         }
     }
 
-    fun joinHouse(){
-        //Obtener datos
-        val codigo=binding.inputCode
+    fun joinHouse() {
+        // Obtener datos
+        val codigo = binding.inputCode.text.toString().trim()
 
         // Validar campos vacíos
-        if ( codigo.text.isEmpty()) {
-            Toast.makeText(this, "Ingrese el codigo del hogar", Toast.LENGTH_SHORT).show()
+        if (codigo.isEmpty()) {
+            Toast.makeText(this, "Ingrese el código del hogar", Toast.LENGTH_SHORT).show()
             return
         }
 
-        //TODO: BUSCAR EN LA BASE DE DATOS UN HOGAR CON ESE CODIGO
+        val database = FirebaseDatabase.getInstance().reference.child("homes")
 
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("CODIGO", codigo.text.toString())
-        startActivity(intent)
+        database.orderByChild("code").equalTo(codigo)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (homeSnapshot in snapshot.children) {
+                            val homeId = homeSnapshot.key
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+                            if (homeId != null && userId != null) {
+                                val membersRef = database.child(homeId).child("members")
+
+                                //Obtiene la lista de miembros que tiene la casa ctualmente
+                                membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(membersSnapshot: DataSnapshot) {
+                                        val membersList = mutableListOf<String>()
+
+                                        // Se añaden los miembros que ya esttan agregados en la casa
+                                        for (member in membersSnapshot.children) {
+                                            member.getValue(String::class.java)?.let {
+                                                membersList.add(it)
+                                            }
+                                        }
+
+                                        // Se agrega al nuevo miembro si no esta en la lista
+                                        if (!membersList.contains(userId)) {
+                                            membersList.add(userId)
+                                            //Modifica la lista de miembros con el nuevo usuario
+                                            membersRef.setValue(membersList).addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Toast.makeText(
+                                                        this@JoinHouse,
+                                                        "Te has unido al hogar correctamente",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    val intent = Intent(this@JoinHouse, MainActivity::class.java)
+                                                    intent.putExtra("CASA_ID", homeId)
+                                                    startActivity(intent)
+                                                } else {
+                                                    Toast.makeText(
+                                                        this@JoinHouse,
+                                                        "Error al unirse al hogar",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
+                                            //Si ya eres miembro del hogar
+                                        } else {
+                                            Toast.makeText(
+                                                this@JoinHouse,
+                                                "Ya eres miembro de este hogar",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+
+                                    override fun onCancelled(error: DatabaseError) {
+                                        Toast.makeText(
+                                            this@JoinHouse,
+                                            "Error al obtener miembros: ${error.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                })
+                            }
+                            return
+                        }
+                        //No existe un hogar con el código ingresado
+                    } else {
+                        Toast.makeText(
+                            this@JoinHouse,
+                            "Código de hogar no encontrado",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(
+                        this@JoinHouse,
+                        "Error en la consulta: ${error.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 }
