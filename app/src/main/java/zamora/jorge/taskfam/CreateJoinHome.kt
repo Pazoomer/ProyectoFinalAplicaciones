@@ -11,23 +11,35 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.databinding.ActivityCreateJoinHomeBinding
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class CreateJoinHome : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateJoinHomeBinding
     private lateinit var casaAdapter: CasaAdapter
     private val listaCasas = mutableListOf<Home>()
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = getColor(android.R.color.black)
         binding = ActivityCreateJoinHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference.child("homes")
 
         window.statusBarColor = Color.BLACK
 
@@ -72,6 +84,49 @@ class CreateJoinHome : AppCompatActivity() {
             Firebase.auth.signOut()
             startActivity(Intent(this,Login::class.java))
         }
+
+        obtenerCasasDeUsuario()
+    }
+
+    private fun obtenerCasasDeUsuario() {
+        val userId = auth.currentUser?.uid ?: return
+
+        database.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val home = snapshot.getValue(Home::class.java)
+                home?.let {
+                    if (it.members.contains(userId)) {
+                        listaCasas.add(it)
+                        casaAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val home = snapshot.getValue(Home::class.java)
+                home?.let {
+                    val index = listaCasas.indexOfFirst { h -> h.id == it.id }
+                    if (index != -1) {
+                        listaCasas[index] = it
+                        casaAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val home = snapshot.getValue(Home::class.java)
+                home?.let {
+                    listaCasas.removeAll { h -> h.id == it.id }
+                    casaAdapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@CreateJoinHome, "Error al obtener hogares: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
 //    private fun llenarListaCasas() {

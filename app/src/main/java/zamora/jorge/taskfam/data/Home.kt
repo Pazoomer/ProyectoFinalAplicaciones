@@ -6,5 +6,5 @@ data class Home(
     var code: String = "",
     var color: Int = 0,
     var editable: Boolean = true,
-    var members: List<String> = emptyList()  // IDs de miembros
+    var members: List<String> = emptyList()
 )

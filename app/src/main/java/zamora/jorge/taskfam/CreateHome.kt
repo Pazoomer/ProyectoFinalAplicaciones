@@ -59,7 +59,6 @@ class CreateHome : AppCompatActivity() {
     private fun openColorPicker() {
         val ambilWarnaDialog = AmbilWarnaDialog(this, defaultColor, object : AmbilWarnaDialog.OnAmbilWarnaListener {
             override fun onCancel(dialog: AmbilWarnaDialog?) {
-                // No hacer nada en caso de cancelar
             }
 
             override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
@@ -85,7 +84,6 @@ class CreateHome : AppCompatActivity() {
             return
         }
 
-        // Primero se intenta crear el codigo unico del hogar
         generarCodigoUnico { codigoGenerado ->
             val database = FirebaseDatabase.getInstance().reference.child("homes")
             val homeId = database.push().key
@@ -100,7 +98,7 @@ class CreateHome : AppCompatActivity() {
                 code = codigoGenerado,
                 color = color,
                 editable = edit,
-                members = listOf(userId) // El creador por el momento, de la creaciom
+                members = listOf(userId)
             )
 
             database.child(homeId).setValue(nuevaCasa)
@@ -127,7 +125,7 @@ class CreateHome : AppCompatActivity() {
             val codigo = (1..7).map { caracteres.random() }.joinToString("")
 
             database.get().addOnSuccessListener { snapshot ->
-                if (!snapshot.exists()) { // Este en caso de que noe existiera la coleccion
+                if (!snapshot.exists()) {
                     callback(codigo)
                     return@addOnSuccessListener
                 }
@@ -135,16 +133,16 @@ class CreateHome : AppCompatActivity() {
                 database.orderByChild("code").equalTo(codigo).get()
                     .addOnSuccessListener { result ->
                         if (result.exists()) {
-                            intentarGenerarCodigo() // ya existe, entonces vuelve a intentar
+                            intentarGenerarCodigo()
                         } else {
                             callback(codigo)
                         }
                     }
                     .addOnFailureListener { e ->
-                        intentarGenerarCodigo() // Se vuelve a intentar, en caso de error  codigo
+                        intentarGenerarCodigo()
                     }
             }.addOnFailureListener { e ->
-                intentarGenerarCodigo() // Se vuelve a intentar si no se pudo
+                intentarGenerarCodigo()
             }
         }
 
