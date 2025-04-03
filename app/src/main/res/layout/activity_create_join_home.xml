@@ -23,6 +23,7 @@
 
     <!-- Para los botones en caso que no haya casa -->
     <LinearLayout
+        android:id="@+id/botones_grandes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

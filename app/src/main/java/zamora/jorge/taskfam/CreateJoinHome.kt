@@ -56,6 +56,8 @@ class CreateJoinHome : AppCompatActivity() {
         casaAdapter = CasaAdapter(this, listaCasas)
         binding.listaCasas.adapter = casaAdapter
 
+
+
         // Manejar clic en los ítems del GridView
         binding.listaCasas.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             val tvCasaNombre = view.findViewById<TextView>(R.id.tv_casa_nombre)
@@ -100,6 +102,8 @@ class CreateJoinHome : AppCompatActivity() {
                         casaAdapter.notifyDataSetChanged()
                     }
                 }
+                //Actualiza la visiblidad de los elementos en caso de tener o no tener casas
+                actualizarVista()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -110,6 +114,8 @@ class CreateJoinHome : AppCompatActivity() {
                         listaCasas[index] = it
                         casaAdapter.notifyDataSetChanged()
                     }
+                    //Actualiza la visiblidad de los elementos en caso de tener o no tener casas
+                    actualizarVista()
                 }
             }
 
@@ -127,6 +133,23 @@ class CreateJoinHome : AppCompatActivity() {
                 Toast.makeText(this@CreateJoinHome, "Error al obtener hogares: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun actualizarVista() {
+        if (listaCasas.isEmpty()) {
+            binding.listaCasas.visibility = View.GONE
+            binding.btnCrearHogar.visibility = View.GONE
+            binding.btnNuevoHogar.visibility = View.GONE
+
+            binding.botonesGrandes.visibility = View.VISIBLE
+        } else {
+            binding.listaCasas.visibility = View.VISIBLE
+            binding.btnCrearHogar.visibility = View.VISIBLE
+            binding.btnNuevoHogar.visibility = View.VISIBLE
+
+            binding.btnCrearHogarGrande.visibility = View.GONE
+            binding.btnNuevoHogarGrande.visibility = View.GONE
+        }
     }
 
 //    private fun llenarListaCasas() {
