@@ -49,6 +49,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
+        android:maxLength="254"
         android:id="@+id/etCorreo"
         android:layout_width="match_parent"
         android:layout_height="70dp"
@@ -77,6 +78,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
+        android:maxLength="12"
         android:id="@+id/etContrasena"
         android:layout_width="match_parent"
         android:layout_height="70dp"

@@ -50,6 +50,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
+        android:maxLength="20"
         android:id="@+id/etNombre"
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -78,6 +79,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
+        android:maxLength="254"
         android:id="@+id/etCorreo"
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -89,6 +91,19 @@
         app:cornerRadius="20dp"
         android:inputType="textEmailAddress" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvFormato"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/format_password"
+        android:textSize="15sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -107,6 +122,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp" />
     <EditText
+        android:maxLength="12"
         android:id="@+id/etContrasena"
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -120,6 +136,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:maxLength="12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

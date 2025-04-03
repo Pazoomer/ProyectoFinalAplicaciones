@@ -31,6 +31,7 @@ class CreateJoinHome : AppCompatActivity() {
     private val listaCasas = mutableListOf<Home>()
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
+    var isFirstLoad = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,18 +46,9 @@ class CreateJoinHome : AppCompatActivity() {
 
         //Obtener datos del intent
         val correo = intent.getStringExtra("correo")
-        //TODO: HACER UNA CONSULTA A LA BASE DE DATOS PARA SABER SI EL USUARIO TIENE UN HOGAR
-
-        //TODO: SI TIENE UN HOGAR, MOSTRARLO EN EL GRIDVIEW
-
-        //TODO: SI NO TIENE UN HOGAR, MOSTRAR LOS DOS BOTONES EN GRANDE
-
-//        llenarListaCasas()
 
         casaAdapter = CasaAdapter(this, listaCasas)
         binding.listaCasas.adapter = casaAdapter
-
-
 
         // Manejar clic en los ítems del GridView
         binding.listaCasas.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -85,9 +77,19 @@ class CreateJoinHome : AppCompatActivity() {
         binding.btnCerrarSesion.setOnClickListener{
             Firebase.auth.signOut()
             startActivity(Intent(this,Login::class.java))
+            finish()
         }
 
-        obtenerCasasDeUsuario()
+        // Se ejecuta solo la primera vez
+        if (isFirstLoad) {
+            obtenerCasasDeUsuario()
+            isFirstLoad = false
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //obtenerCasasDeUsuario()
     }
 
     private fun obtenerCasasDeUsuario() {
@@ -151,29 +153,6 @@ class CreateJoinHome : AppCompatActivity() {
             binding.btnNuevoHogarGrande.visibility = View.GONE
         }
     }
-
-//    private fun llenarListaCasas() {
-//        listaCasas.apply {
-//            add(Home("Casa Mochis"))
-//            add(Casa("Casa Monterrey"))
-//            add(Casa("Casa Guadalajara"))
-//            add(Casa("Casa CDMX"))
-//            add(Casa("Casa Cancún"))
-//            add(Casa("Casa Puebla"))
-//            add(Casa("Casa Mochis"))
-//            add(Casa("Casa Monterrey"))
-//            add(Casa("Casa Guadalajara"))
-//            add(Casa("Casa CDMX"))
-//            add(Casa("Casa Cancún"))
-//            add(Casa("Casa Puebla"))
-//            add(Casa("Casa Mochis"))
-//            add(Casa("Casa Monterrey"))
-//            add(Casa("Casa Guadalajara"))
-//            add(Casa("Casa CDMX"))
-//            add(Casa("Casa Cancún"))
-//            add(Casa("Casa Puebla"))
-//        }
-//    }
 
     inner class CasaAdapter(private val context: Context, private val casas: List<Home>) : BaseAdapter() {
         override fun getCount(): Int = casas.size

@@ -29,6 +29,7 @@
         android:layout_marginBottom="80dp" />
 
     <EditText
+        android:maxLength="20"
         android:id="@+id/etNombreHogar"
         android:layout_width="match_parent"
         android:layout_height="70dp"

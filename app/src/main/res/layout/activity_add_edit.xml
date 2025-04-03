@@ -40,6 +40,7 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
+                android:maxLength="30"
                 android:id="@+id/etNombreTarea"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
@@ -53,6 +54,7 @@
                 app:cornerRadius="20dp"/>
 
             <EditText
+                android:maxLength="50"
                 android:id="@+id/etDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"

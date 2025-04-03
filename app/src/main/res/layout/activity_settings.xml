@@ -57,6 +57,7 @@
             android:layout_marginLeft="10dp"
             app:tint="@color/gray_light" />
         <EditText
+            android:maxLength="20"
             android:id="@+id/etNombreHogar"
             android:layout_width="match_parent"
             android:layout_height="70dp"
@@ -92,16 +93,17 @@
                 android:src="@drawable/person_svg"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp" />
-        <EditText
-            android:id="@+id/etRolMembers"
+        <TextView
+            android:id="@+id/tvRolMembers"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="match_parent"
             android:textSize="20sp"
-            android:hint="@string/members_role"
+            android:layout_marginTop="20dp"
+            android:textAlignment="textStart"
+            android:layout_marginLeft="20dp"
+            android:text="@string/members_role"
             android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:background="@drawable/background_blue_sky"
-            android:inputType="textPassword" />
+            android:background="@drawable/background_blue_sky" />
         </LinearLayout>
 
         <LinearLayout

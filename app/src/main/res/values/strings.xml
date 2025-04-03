@@ -48,4 +48,5 @@
     <string name="complete_task">Completar tarea</string>
     <string name="name">Nombre</string>
     <string name="delete_house">Borrar hogar</string>
+    <string name="format_password">La contraseña debe medir de 6 a 12 caracteres, debe contener al menos una mayuscula y una minuscula</string>
 </resources>
