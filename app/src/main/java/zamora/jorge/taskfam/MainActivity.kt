@@ -70,6 +70,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.addTask.setOnClickListener {
             val intent = Intent(this, AddEdit::class.java)
+            intent.putExtra("Home", home)
+            intent.putExtra("Accion", "AGREGAR")
             startActivity(intent)
         }
 
