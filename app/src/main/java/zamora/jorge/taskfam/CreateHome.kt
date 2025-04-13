@@ -98,7 +98,9 @@ class CreateHome : AppCompatActivity() {
                 code = codigoGenerado,
                 color = color,
                 editable = edit,
+                adminId = userId,
                 members = listOf(userId)
+
             )
 
             database.child(homeId).setValue(nuevaCasa)

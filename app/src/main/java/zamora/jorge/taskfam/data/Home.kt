@@ -9,6 +9,7 @@ data class Home(
     var code: String = "",
     var color: Int = 0,
     var editable: Boolean = true,
+    var adminId:String ="",
     var members: List<String> = emptyList()
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -17,6 +18,7 @@ data class Home(
         parcel.readString() ?: "",
         parcel.readInt(),
         parcel.readByte() != 0.toByte(),
+        parcel.readString()?:"",
         parcel.createStringArrayList() ?: emptyList()
     )
 
@@ -26,6 +28,7 @@ data class Home(
         parcel.writeString(code)
         parcel.writeInt(color)
         parcel.writeByte(if (editable) 1 else 0)
+        parcel.writeString(adminId)
         parcel.writeStringList(members)
     }
 
