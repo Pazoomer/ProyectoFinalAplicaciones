@@ -3,6 +3,7 @@ package zamora.jorge.taskfam
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -153,11 +155,16 @@ class CreateJoinHome : AppCompatActivity() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_home, parent, false)
 
+            val home = casas[position]
+
             val tvCasaNombre = view.findViewById<TextView>(R.id.tv_casa_nombre)
+            val icon = view.findViewById<ImageView>(R.id.ivHomeIcon)
+
             tvCasaNombre.text = casas[position].nombre
+            icon.setColorFilter(home.color, PorterDuff.Mode.SRC_IN)
 
             view.setOnClickListener {
-                val home = casas[position]
+
                 val intent = Intent(context, MainActivity::class.java)
                 intent.putExtra("HOME", home)
                 context.startActivity(intent)

@@ -10,7 +10,9 @@ data class Home(
     var color: Int = 0,
     var editable: Boolean = true,
     var adminId:String ="",
-    var members: List<String> = emptyList()
+    var members: List<String> = emptyList(),
+    var adminisId: List <String> = emptyList()
+
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -19,7 +21,8 @@ data class Home(
         parcel.readInt(),
         parcel.readByte() != 0.toByte(),
         parcel.readString()?:"",
-        parcel.createStringArrayList() ?: emptyList()
+        parcel.createStringArrayList() ?: emptyList(),
+        parcel.createStringArrayList()?: emptyList()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -30,6 +33,7 @@ data class Home(
         parcel.writeByte(if (editable) 1 else 0)
         parcel.writeString(adminId)
         parcel.writeStringList(members)
+        parcel.writeStringList(adminisId)
     }
 
     override fun describeContents(): Int {

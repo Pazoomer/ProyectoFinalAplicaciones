@@ -44,14 +44,14 @@ class Login : AppCompatActivity() {
         }
 
         binding.btnIniciarSesion.setOnClickListener {
-            //iniciarSesion()
+            iniciarSesion()
         }
         auth = Firebase.auth
         val email: EditText =findViewById(R.id.etCorreo)
         val password: EditText =findViewById(R.id.etContrasena)
         val error: TextView =findViewById(R.id.tvError)
         val buttonLogin: Button =findViewById(R.id.btnIniciarSesion)
-        //val buttonRegister: TextView =findViewById(R.id.tvNoTienesCuenta)
+        val buttonRegister: TextView =findViewById(R.id.tvNoTienesCuenta)
 
         error.visibility= View.INVISIBLE
 
@@ -64,12 +64,12 @@ class Login : AppCompatActivity() {
                 login(email.text.toString(),password.text.toString())
             }
         }
-        /*
+
         buttonRegister.setOnClickListener{
-            val intent: Intent = Intent(this,SignInActivity::class.java)
+            val intent: Intent = Intent(this,Register::class.java)
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
-        }*/
+        }
     }
 
     fun noTienesCuenta() {

@@ -47,7 +47,7 @@ class Register : AppCompatActivity() {
         }
 
         binding.btnRegistrarse.setOnClickListener {
-            //registrarse()
+            registrarse()
         }
 
 

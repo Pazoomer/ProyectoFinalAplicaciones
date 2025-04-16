@@ -75,7 +75,38 @@ class JoinHouse : AppCompatActivity() {
                                             membersList.add(userId)
                                             //Modifica la lista de miembros con el nuevo usuario
                                             membersRef.setValue(membersList).addOnCompleteListener { task ->
+
                                                 if (task.isSuccessful) {
+                                                    val editable = homeSnapshot.child("editable").getValue(Boolean::class.java) ?: false
+
+                                                    if (editable) {
+                                                        val adminsRef = database.child(homeId).child("adminsId")
+                                                        adminsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                                            override fun onDataChange(adminsSnapshot: DataSnapshot) {
+                                                                val adminsList = mutableListOf<String>()
+
+                                                                for (admin in adminsSnapshot.children) {
+                                                                    admin.getValue(String::class.java)?.let {
+                                                                        adminsList.add(it)
+                                                                    }
+                                                                }
+
+                                                                if (!adminsList.contains(userId)) {
+                                                                    adminsList.add(userId)
+                                                                    adminsRef.setValue(adminsList)
+                                                                }
+                                                            }
+
+                                                            override fun onCancelled(error: DatabaseError) {
+                                                                Toast.makeText(
+                                                                    this@JoinHouse,
+                                                                    "Error al obtener miembros: ${error.message}",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+                                                        })
+                                                    }
+
                                                     Toast.makeText(
                                                         this@JoinHouse,
                                                         "Te has unido al hogar correctamente",
@@ -92,7 +123,6 @@ class JoinHouse : AppCompatActivity() {
                                                     ).show()
                                                 }
                                             }
-                                            //Si ya eres miembro del hogar
                                         } else {
                                             Toast.makeText(
                                                 this@JoinHouse,
@@ -113,7 +143,6 @@ class JoinHouse : AppCompatActivity() {
                             }
                             return
                         }
-                        //No existe un hogar con el código ingresado
                     } else {
                         Toast.makeText(
                             this@JoinHouse,
