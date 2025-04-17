@@ -1,7 +1,9 @@
 package zamora.jorge.taskfam.data
 
 data class Task(
-    var title: String,
-    var description: String,
-    var miembro: String
+    val id: String,
+    val titulo: String,
+    val descripcion: String,
+    val homeId: String,
+    val assignments: Map<String, Map<String, Boolean>>
 )

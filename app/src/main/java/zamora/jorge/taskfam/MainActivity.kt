@@ -158,35 +158,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private class TaskAdapter(private val context: Context, private val tareas: List<Task>) : BaseAdapter() {
-        override fun getCount(): Int = tareas.size
-        override fun getItem(position: Int): Any = tareas[position]
-        override fun getItemId(position: Int): Long = position.toLong()
 
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            Log.d("TaskAdapter", "getView called with position: $position")
-            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_task_list, parent, false)
-
-            val tvMiembro: TextView = view.findViewById<TextView>(R.id.tv_miembro)
-            val tvTitulo: TextView= view.findViewById<TextView>(R.id.tv_titulotarea)
-            val tvDescripcion: TextView = view.findViewById<TextView>(R.id.tv_descripciontarea)
-            val llContainer: LinearLayout = view.findViewById<LinearLayout>(R.id.ll_container)
-
-            val tarea = tareas[position]
-            tvMiembro.text = tarea.miembro
-            tvTitulo.text = tarea.title
-            tvDescripcion.text = tarea.description
-            Log.d("TaskAdapter", "Task title: ${tarea.title}")
-
-            llContainer.setOnClickListener{
-                val intent = Intent(context, TaskDetail::class.java).apply {
-                    putExtra("TAREA_NOMBRE", tarea.title)
-                    putExtra("TAREA_DESCRIPCION", tarea.description)
-                    putExtra("TAREA_MIEMBRO", tarea.miembro)
-                }
-                context.startActivity(intent)
-            }
-            return view
-        }
-    }
+    // TODO actualizar para adpatación de la nueva estructura de las tareas
+//    private class TaskAdapter(private val context: Context, private val tareas: List<Task>) : BaseAdapter() {
+//        override fun getCount(): Int = tareas.size
+//        override fun getItem(position: Int): Any = tareas[position]
+//        override fun getItemId(position: Int): Long = position.toLong()
+//
+//        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+//            Log.d("TaskAdapter", "getView called with position: $position")
+//            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_task_list, parent, false)
+//
+//            val tvMiembro: TextView = view.findViewById<TextView>(R.id.tv_miembro)
+//            val tvTitulo: TextView= view.findViewById<TextView>(R.id.tv_titulotarea)
+//            val tvDescripcion: TextView = view.findViewById<TextView>(R.id.tv_descripciontarea)
+//            val llContainer: LinearLayout = view.findViewById<LinearLayout>(R.id.ll_container)
+//
+//            val tarea = tareas[position]
+//            tvMiembro.text = tarea.miembro
+//            tvTitulo.text = tarea.title
+//            tvDescripcion.text = tarea.description
+//            Log.d("TaskAdapter", "Task title: ${tarea.title}")
+//
+//            llContainer.setOnClickListener{
+//                val intent = Intent(context, TaskDetail::class.java).apply {
+//                    putExtra("TAREA_NOMBRE", tarea.title)
+//                    putExtra("TAREA_DESCRIPCION", tarea.description)
+//                    putExtra("TAREA_MIEMBRO", tarea.miembro)
+//                }
+//                context.startActivity(intent)
+//            }
+//            return view
+//        }
+//    }
 }
