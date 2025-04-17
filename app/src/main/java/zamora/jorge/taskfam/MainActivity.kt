@@ -18,6 +18,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.Firebase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 import zamora.jorge.taskfam.data.Day
 import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.data.Task
@@ -28,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private val listaDias = mutableListOf<Day>()
     private var mostrarSoloHoy = false
     private var home: Home? = null
+    
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,22 +88,61 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
+        println("hola desde oncreate")
+        cargarTareasDelHogarActual()
     }
 
-//    private fun llenarListaDias() {
-//        listaDias.add(Day("Lunes", listOf(
-//            Task("Cocinar", "Tienes que limpiar bien", "Chuy"),
-//            Task("Cocinar2", "Tienes que limpiar bien", "Chuy"),
-//            Task("Limpiar baño", "Tienes que limpiar bien", "Chuy"),
-//
-//        ), false))
-//
-//        listaDias.add(Day("Martes", listOf(
-//            Task("Sacar la basura", "Hoy es día de recolección", "Maria"),
-//            Task("Sacar la basura2", "Hoy es día de recolección", "Maria")
-//        ), false))
-//    }
+
+    private fun cargarTareasDelHogarActual() {
+        val db = FirebaseDatabase.getInstance().reference
+        val homeIdActual = home?.id ?: return
+        println("hola tareas")
+
+        db.child("tasks").orderByChild("homeId").equalTo(homeIdActual)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (!snapshot.exists()) {
+                        Log.d("TAREAS", "No se encontraron tareas en Firebase")
+                    }
+                    val tareasPorDia = mutableMapOf<String, MutableList<Task>>() // día -> tareas
+
+                    for (taskSnapshot in snapshot.children) {
+                        val task = taskSnapshot.getValue(Task::class.java)
+                        if (task != null) {
+                            for ((memberId, diasYEstado) in task.assignments) {
+                                for ((dia, estado) in diasYEstado) {
+                                    tareasPorDia.getOrPut(dia) { mutableListOf() }.add(task)
+                                }
+                            }
+                        }
+                    }
+                    Log.d("TAREAS", "Tareas cargadas: ${tareasPorDia.size}")
+
+                    // Aquí podrías convertir el mapa a una lista ordenada si quieres
+                    val diasOrdenados = listOf("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
+                    val listaAgrupada = tareasPorDia.map { (dia, tareas) ->
+                        Day(dia, tareas.map { it.id })
+                    }
+
+
+                    listaDias.clear()
+                    listaDias.addAll(listaAgrupada)
+                    Log.d("TAREAS", "Tareas cargadas: ${listaDias.size}")
+
+                    // Actualizamos la UI
+                    (binding.lvDias.adapter as DayAdapter).updateList(getDiasMostrados())
+
+                    // Si tienes una nueva forma de mostrar estos datos, aquí puedes actualizar el adapter
+                    // Por ejemplo: myAdapter.updateDias(listaAgrupada)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("TAREAS", "Error al obtener tareas", error.toException())
+                }
+            })
+    }
+
+
 
     private fun getDiasMostrados(): List<Day> {
         return if (mostrarSoloHoy) {
@@ -118,7 +164,6 @@ class MainActivity : AppCompatActivity() {
         override fun getItemId(position: Int): Long = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            Log.d("DayAdapter", "getView called with position: $position")
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_day, parent, false)
 
             val tvDia: TextView = view.findViewById(R.id.tv_dia)
@@ -127,15 +172,9 @@ class MainActivity : AppCompatActivity() {
             val dia = dias[position]
             tvDia.text = dia.nombre
 
+            // Actualiza el progreso dependiendo de las tareas
             progressBar.max = dia.tareas.size
-            progressBar.progress = dia.tareas.count { false }
-
-//            val tareaAdapter = TaskAdapter(context, dia.tareas)
-            Log.d("DayAdapter", "TaskAdapter created with ${dia.tareas.size} items")
-
-            val listViewTareas: ListView = view.findViewById(R.id.lv_tareas)
-//            listViewTareas.adapter = tareaAdapter
-            setListViewHeightBasedOnChildren(listViewTareas)
+            progressBar.progress = dia.tareas.count { false } // Lógica de estado de las tareas
 
             return view
         }
