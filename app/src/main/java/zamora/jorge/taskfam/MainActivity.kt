@@ -3,59 +3,54 @@ package zamora.jorge.taskfam
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.Firebase
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
-import zamora.jorge.taskfam.data.Day
+import kotlinx.coroutines.tasks.await
 import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val listaDias = mutableListOf<Day>()
+    private val tareasPorDia: MutableMap<String, MutableList<Task>> = mutableMapOf()
+
     private var mostrarSoloHoy = false
     private var home: Home? = null
-    
+    private lateinit var dayAdapter: DayAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        home = intent.getParcelableExtra<Home>("HOME")
-
+        home = intent.getParcelableExtra("HOME")
         window.statusBarColor = Color.BLACK
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        //llenarListaDias()
-        val dayAdapter = DayAdapter(this, listaDias)
+        dayAdapter = DayAdapter(this, emptyList(), tareasPorDia)
+        binding.lvDias.layoutManager = LinearLayoutManager(this)
         binding.lvDias.adapter = dayAdapter
 
         binding.switchOnOff.setOnCheckedChangeListener { _, isChecked ->
@@ -71,8 +66,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnBack.setOnClickListener {
-            val intent = Intent(this, CreateJoinHome::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, CreateJoinHome::class.java))
         }
 
         binding.addTask.setOnClickListener {
@@ -88,7 +82,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        println("hola desde oncreate")
         cargarTareasDelHogarActual()
     }
 
@@ -96,44 +89,39 @@ class MainActivity : AppCompatActivity() {
     private fun cargarTareasDelHogarActual() {
         val db = FirebaseDatabase.getInstance().reference
         val homeIdActual = home?.id ?: return
-        println("hola tareas")
+
+        // Inicializamos todos los días con listas vacías
+        val diasSemana = listOf("lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo")
+        tareasPorDia.clear()
+        for (dia in diasSemana) {
+            tareasPorDia[dia] = mutableListOf()
+        }
 
         db.child("tasks").orderByChild("homeId").equalTo(homeIdActual)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (!snapshot.exists()) {
-                        Log.d("TAREAS", "No se encontraron tareas en Firebase")
-                    }
-                    val tareasPorDia = mutableMapOf<String, MutableList<Task>>() // día -> tareas
-
                     for (taskSnapshot in snapshot.children) {
                         val task = taskSnapshot.getValue(Task::class.java)
                         if (task != null) {
-                            for ((memberId, diasYEstado) in task.assignments) {
-                                for ((dia, estado) in diasYEstado) {
-                                    tareasPorDia.getOrPut(dia) { mutableListOf() }.add(task)
+                            for ((_, diasYEstado) in task.assignments) {
+                                for ((diaRaw, _) in diasYEstado) {
+                                    val diaNormalizado = diaRaw.lowercase()
+                                        .replace("á", "a")
+                                        .replace("é", "e")
+                                        .replace("í", "i")
+                                        .replace("ó", "o")
+                                        .replace("ú", "u")
+
+                                    tareasPorDia[diaNormalizado]?.add(task)
+                                    Log.d("TAREAS", "Tarea agregada al día $diaNormalizado: $task")
+                                    Log.d("TAREAS", "Esta tarea es de: ${task.assignments.toString()}")
                                 }
                             }
                         }
                     }
-                    Log.d("TAREAS", "Tareas cargadas: ${tareasPorDia.size}")
 
-                    // Aquí podrías convertir el mapa a una lista ordenada si quieres
-                    val diasOrdenados = listOf("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
-                    val listaAgrupada = tareasPorDia.map { (dia, tareas) ->
-                        Day(dia, tareas.map { it.id })
-                    }
-
-
-                    listaDias.clear()
-                    listaDias.addAll(listaAgrupada)
-                    Log.d("TAREAS", "Tareas cargadas: ${listaDias.size}")
-
-                    // Actualizamos la UI
-                    (binding.lvDias.adapter as DayAdapter).updateList(getDiasMostrados())
-
-                    // Si tienes una nueva forma de mostrar estos datos, aquí puedes actualizar el adapter
-                    // Por ejemplo: myAdapter.updateDias(listaAgrupada)
+                    // Mostrar todos los días, con tareas o sin ellas
+                    dayAdapter.updateList(diasSemana)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -144,90 +132,116 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun getDiasMostrados(): List<Day> {
+
+    private fun getDiasMostrados(): List<String> {
         return if (mostrarSoloHoy) {
-            listaDias.take(1)
+            val diaActual = obtenerDiaActual()
+            listOf(diaActual)
         } else {
-            listaDias
+            tareasPorDia.keys.toList()
         }
     }
 
-    private class DayAdapter(private val context: Context, private var dias: List<Day>) : BaseAdapter() {
-        //Lo estoy poniendo para que actualice los dias dependiendo el switch
-        fun updateList(newList: List<Day>) {
-            dias = newList
+    private fun obtenerDiaActual(): String {
+        val dias = listOf("domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado")
+        val calendar = Calendar.getInstance()
+        return dias[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+    }
+
+    class DayAdapter(
+        private val context: Context,
+        private var dias: List<String>,
+        private val tareasPorDia: Map<String, List<Task>>
+    ) : RecyclerView.Adapter<DayAdapter.DayViewHolder>() {
+
+        class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val tvNombreDia: TextView = view.findViewById(R.id.tv_dia)
+            val rvTareas: RecyclerView = view.findViewById(R.id.lv_tareas)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
+            val view = LayoutInflater.from(context).inflate(R.layout.item_day, parent, false)
+            return DayViewHolder(view)
+        }
+
+        override fun getItemCount(): Int = dias.size
+
+        override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
+            val dia = dias[position]
+            holder.tvNombreDia.text = dia
+
+            val tareasDelDia = tareasPorDia[dia] ?: emptyList()
+            val taskAdapter = TaskAdapter(context, tareasDelDia, dia)
+
+            holder.rvTareas.layoutManager = LinearLayoutManager(context)
+            holder.rvTareas.adapter = taskAdapter
+        }
+
+        fun updateList(nuevaLista: List<String>) {
+            dias = nuevaLista
             notifyDataSetChanged()
         }
-
-        override fun getCount(): Int = dias.size
-        override fun getItem(position: Int): Any = dias[position]
-        override fun getItemId(position: Int): Long = position.toLong()
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_day, parent, false)
-
-            val tvDia: TextView = view.findViewById(R.id.tv_dia)
-            val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
-
-            val dia = dias[position]
-            tvDia.text = dia.nombre
-
-            // Actualiza el progreso dependiendo de las tareas
-            progressBar.max = dia.tareas.size
-            progressBar.progress = dia.tareas.count { false } // Lógica de estado de las tareas
-
-            return view
-        }
-        private fun setListViewHeightBasedOnChildren(listView: ListView) {
-            val listAdapter = listView.adapter ?: return
-            var totalHeight = 0
-            for (i in 0 until listAdapter.count) {
-                Log.d("DayAdapter", "Setting height for item $i")
-                val listItem = listAdapter.getView(i, null, listView)
-                listItem.measure(
-                    View.MeasureSpec.makeMeasureSpec(listView.width, View.MeasureSpec.AT_MOST),
-                    View.MeasureSpec.UNSPECIFIED
-                )
-                totalHeight += listItem.measuredHeight
-            }
-            val params = listView.layoutParams
-            params.height = totalHeight + (listView.dividerHeight * (listAdapter.count - 1))
-            listView.layoutParams = params
-            listView.requestLayout()
-        }
     }
 
 
-    // TODO actualizar para adpatación de la nueva estructura de las tareas
-//    private class TaskAdapter(private val context: Context, private val tareas: List<Task>) : BaseAdapter() {
-//        override fun getCount(): Int = tareas.size
-//        override fun getItem(position: Int): Any = tareas[position]
-//        override fun getItemId(position: Int): Long = position.toLong()
-//
-//        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-//            Log.d("TaskAdapter", "getView called with position: $position")
-//            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_task_list, parent, false)
-//
-//            val tvMiembro: TextView = view.findViewById<TextView>(R.id.tv_miembro)
-//            val tvTitulo: TextView= view.findViewById<TextView>(R.id.tv_titulotarea)
-//            val tvDescripcion: TextView = view.findViewById<TextView>(R.id.tv_descripciontarea)
-//            val llContainer: LinearLayout = view.findViewById<LinearLayout>(R.id.ll_container)
-//
-//            val tarea = tareas[position]
-//            tvMiembro.text = tarea.miembro
-//            tvTitulo.text = tarea.title
-//            tvDescripcion.text = tarea.description
-//            Log.d("TaskAdapter", "Task title: ${tarea.title}")
-//
-//            llContainer.setOnClickListener{
-//                val intent = Intent(context, TaskDetail::class.java).apply {
-//                    putExtra("TAREA_NOMBRE", tarea.title)
-//                    putExtra("TAREA_DESCRIPCION", tarea.description)
-//                    putExtra("TAREA_MIEMBRO", tarea.miembro)
-//                }
-//                context.startActivity(intent)
-//            }
-//            return view
-//        }
-//    }
+
+
+    class TaskAdapter(
+        private val context: Context,
+        private val tareas: List<Task>,
+        private val dia: String
+    ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+
+        class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val tvTituloTarea: TextView = view.findViewById(R.id.tv_titulotarea)
+            val tvDescripcionTarea: TextView = view.findViewById(R.id.tv_descripciontarea)
+            val tvMiembroTarea: TextView = view.findViewById(R.id.tv_miembro)
+        }
+
+        fun obtenerNombreMiembroPorId(miembroId: String, callback: (String?) -> Unit) {
+            val db = FirebaseDatabase.getInstance().reference
+            db.child("members").child(miembroId).child("name")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val nombre = snapshot.getValue(String::class.java)
+                        callback(nombre) // Devuelve el nombre por callback
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("FIREBASE", "Error al obtener nombre del miembro", error.toException())
+                        callback(null)
+                    }
+                })
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+            val view = LayoutInflater.from(context).inflate(R.layout.item_task_list, parent, false)
+            return TaskViewHolder(view)
+        }
+
+        override fun getItemCount(): Int = tareas.size
+
+        override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+            val tarea = tareas[position]
+            if (!tarea.titulo.isNullOrBlank()) {
+                holder.tvTituloTarea.text = tarea.titulo
+            } else {
+                holder.tvTituloTarea.text = "(Tarea sin título)"
+            }
+
+            val miembroId = tarea.assignments.keys.firstOrNull()
+
+            if (miembroId != null) {
+
+                obtenerNombreMiembroPorId(miembroId) { nombre ->
+
+                    holder.tvMiembroTarea.text = nombre ?: "(Miembro no encontrado)"
+                }
+            } else {
+                holder.tvMiembroTarea.text = "(No hay miembro asignado)"
+            }
+        }
+
+    }
 }
+
