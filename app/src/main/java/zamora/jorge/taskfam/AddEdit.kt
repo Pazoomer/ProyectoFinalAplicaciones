@@ -35,8 +35,9 @@ class AddEdit : AppCompatActivity() {
     private var miembrosDisponibles = mutableListOf<Member>()
     private var miembrosAsignados = mutableListOf<MembersDay>()
     private lateinit var adapter: MiembroAdapter
-    private var accion: String?=""
-    private var home: Home?= null
+    private var accion: String? = ""
+    private var home: Home? = null
+    private var tarea: Task? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,34 +46,58 @@ class AddEdit : AppCompatActivity() {
 
         val bundle = intent.extras
 
-
-
-
         binding = ActivityAddEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (bundle!=null){
+        if (bundle != null) {
             accion = bundle.getString("Accion")
             home = bundle.get("Home") as Home?
+            tarea = bundle.get("TASK") as Task?
+
             obtenerMiembrosDeHome { listaMiembros ->
                 miembrosDisponibles = listaMiembros.toMutableList()
                 actualizarAdapter()
             }
             binding.tvAgregarEditar.text = accion
             binding.btnAgregarEditar.text = accion
+
+            if (accion == "EDITAR") {
+                binding.etNombreTarea.setText(tarea?.titulo)
+                binding.etDescripcion.setText(tarea?.descripcion)
+
+                val assignments = tarea?.assignments ?: emptyMap()
+
+                obtenerMiembrosPorIds(assignments.keys.toList()) { miembros ->
+                    val miembrosDeTarea = mutableListOf<MembersDay>()
+
+                    for (miembro in miembros) {
+                        val diasAsignados = assignments[miembro.id] ?: emptyMap()
+                        val diasSeleccionados =
+                            diasAsignados.keys.associateWith { true }.toMutableMap()
+                        miembrosDeTarea.add(MembersDay(miembro, diasSeleccionados))
+                    }
+
+                    miembrosAsignados.clear()
+                    miembrosAsignados.addAll(miembrosDeTarea)
+
+                    miembrosDisponibles.removeAll(miembros.map { it })
+
+                    actualizarAdapter()
+                }
+
+
+            }
         }
-
-
 
         binding.btnAgregarHabitante.setOnClickListener {
             agregarHabitante()
         }
 
         binding.btnAgregarEditar.setOnClickListener {
-            if (accion.equals("AGREGAR")){
+            if (accion.equals("AGREGAR")) {
                 agregarTarea()
-            }else if (accion.equals("EDITAR")){
-                //TODO método actualizar tareas
+            } else if (accion.equals("EDITAR")) {
+                actualizarTarea()
             }
         }
 
@@ -166,7 +191,8 @@ class AddEdit : AppCompatActivity() {
     }
 
     private fun actualizarAdapter() {
-        adapter = MiembroAdapter(this, miembrosAsignados, miembrosDisponibles) { actualizarAdapter() }
+        adapter =
+            MiembroAdapter(this, miembrosAsignados, miembrosDisponibles) { actualizarAdapter() }
         binding.lvMiembros.adapter = adapter
     }
 
@@ -196,7 +222,7 @@ class AddEdit : AppCompatActivity() {
                 diasSeleccionados["Lunes"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Martes")) {
-                diasSeleccionados["Martes"]= false
+                diasSeleccionados["Martes"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Miércoles")) {
                 diasSeleccionados["Miércoles"] = false
@@ -219,7 +245,8 @@ class AddEdit : AppCompatActivity() {
             }
 
             // Actualizamos el miembro con el nuevo ID de tarea
-            val miembroRef = FirebaseDatabase.getInstance().reference.child("members").child(miembro.member.id)
+            val miembroRef =
+                FirebaseDatabase.getInstance().reference.child("members").child(miembro.member.id)
             miembroRef.child("tasks").push().setValue(taskId)
         }
 
@@ -247,6 +274,78 @@ class AddEdit : AppCompatActivity() {
                 Toast.makeText(this, "Error al crear la tarea", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun actualizarTarea() {
+        val nombre = binding.etNombreTarea.text.toString()
+        val descripcion = binding.etDescripcion.text.toString()
+
+        if (nombre.isEmpty() || descripcion.isEmpty()) {
+            Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (miembrosAsignados.isEmpty()) {
+            Toast.makeText(this, "Por favor agregue al menos un miembro", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val asignaciones = mutableMapOf<String, Map<String, Boolean>>()
+
+        for (miembro in miembrosAsignados) {
+            val diasSeleccionados = mutableMapOf<String, Boolean>()
+
+            // Solo agregamos los días seleccionados
+            if (miembro.diasSeleccionados.containsKey("Lunes")) {
+                diasSeleccionados["Lunes"] = false
+            }
+            if (miembro.diasSeleccionados.containsKey("Martes")) {
+                diasSeleccionados["Martes"] = false
+            }
+            if (miembro.diasSeleccionados.containsKey("Miércoles")) {
+                diasSeleccionados["Miércoles"] = false
+            }
+            if (miembro.diasSeleccionados.containsKey("Jueves")) {
+                diasSeleccionados["Jueves"] = false
+            }
+            if (miembro.diasSeleccionados.containsKey("Viernes")) {
+                diasSeleccionados["Viernes"] = false
+            }
+            if (miembro.diasSeleccionados.containsKey("Sábado")) {
+                diasSeleccionados["Sábado"] = false
+            }
+            if (miembro.diasSeleccionados.containsKey("Domingo")) {
+                diasSeleccionados["Domingo"] = false
+            }
+
+            if (diasSeleccionados.isNotEmpty()) {
+                asignaciones[miembro.member.id] = diasSeleccionados
+            }
+        }
+
+        val tareaActualizada = Task(
+            id = tarea?.id ?: return,
+            titulo = nombre,
+            descripcion = descripcion,
+            homeId = home?.id ?: "",
+            assignments = asignaciones
+        )
+
+        val database = FirebaseDatabase.getInstance().reference
+        database.child("tasks").child(tarea?.id ?: "").setValue(tareaActualizada)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Tarea actualizada exitosamente", Toast.LENGTH_SHORT).show()
+
+                val homeRef =
+                    FirebaseDatabase.getInstance().reference.child("homes").child(home?.id ?: "")
+                homeRef.child("tasks").push().setValue(tarea?.id)
+
+                startActivity(Intent(this, MainActivity::class.java))
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al actualizar la tarea", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }
 
 class MiembroAdapter(
@@ -257,7 +356,8 @@ class MiembroAdapter(
 ) : ArrayAdapter<MembersDay>(context, 0, miembrosAsignados) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_member, parent, false)
+        val view =
+            convertView ?: LayoutInflater.from(context).inflate(R.layout.item_member, parent, false)
         val miembroActual = miembrosAsignados[position]
 
         val spinner = view.findViewById<Spinner>(R.id.sSeleccionMiembro)
@@ -276,7 +376,8 @@ class MiembroAdapter(
 
         // Listener para el checkbox "Todos los días"
         val todosDiasListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+            val dias =
+                listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
             if (isChecked) {
                 dias.forEach { mapaDias[it] = true } // Marca todos los días
             } else {
@@ -314,7 +415,12 @@ class MiembroAdapter(
         spinner.setSelection(0)
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, selectedIndex: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                selectedIndex: Int,
+                id: Long
+            ) {
                 val seleccionado = opciones[selectedIndex]
                 if (seleccionado != miembroActual.member) {
                     miembrosDisponibles.add(miembroActual.member)

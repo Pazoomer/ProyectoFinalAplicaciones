@@ -232,8 +232,7 @@ class MainActivity : AppCompatActivity() {
             holder.tvTituloTarea.text = tarea.titulo.ifBlank { "(Tarea sin título)" }
             holder.tvDescripcionTarea.text = tarea.descripcion.ifBlank { "(Tarea sin descripción)" }
 
-
-            val miembroId = tarea.assignments.keys.firstOrNull()
+            val miembroId = tarea.assignments.entries.firstOrNull { it.value.containsKey(dia) }?.key
             if (miembroId != null) {
                 obtenerMiembroPorId(miembroId) { miembro ->
                     holder.tvMiembroTarea.text = miembro?.name ?: "(Miembro no encontrado)"
@@ -291,6 +290,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             holder.itemView.setOnClickListener {
+                Log.d("Tarea info:", "Tarea:\n$tarea")
+
                 val intent = Intent(context, TaskDetail::class.java)
                 intent.putExtra("TASK", tarea)
                 intent.putExtra("HOME", home)

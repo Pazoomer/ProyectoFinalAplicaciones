@@ -12,6 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -32,8 +34,8 @@ import zamora.jorge.taskfam.databinding.ActivityTaskDetailBinding
 class TaskDetail : AppCompatActivity() {
     // TODO: ATENCIOOOOOOOON
     // TODO: hola chuy
-// TODO: Deje una base que es prácticamente el código anterior, pero te dejeré esa chamba, que funcione bien los datos de la pantalla,
-    //
+    // TODO: Deje una base que es prácticamente el código anterior, pero te dejeré esa chamba, que funcione bien los datos de la pantalla,
+
     private lateinit var binding: ActivityTaskDetailBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +50,8 @@ class TaskDetail : AppCompatActivity() {
         window.statusBarColor = Color.BLACK
 
 
+
+
         binding = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -56,112 +60,95 @@ class TaskDetail : AppCompatActivity() {
         binding.tvTitulotarea.text = tarea?.titulo ?: "Tarea sin título"
         binding.tvDescripcion.text = tarea?.descripcion ?: "Tarea sin descripción"
 
+        val miembrosAsignados = tarea?.assignments?.keys?.toList() ?: emptyList()
 
         //Esta harcodeado el día, pero no debe de ser así
-        binding.lvTaskDetail.adapter = TaskDetailAdapter(this, listOf(tarea!!), home!!, dia = "Lunes")
-
-
+        binding.lvTaskDetail.adapter = MiembroTareaAdapter(this, tarea!!, home!!)
 
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("HOME", home)
             startActivity(intent)
         }
 
+        binding.editTask.setOnClickListener {
+            val intent = Intent(this, AddEdit::class.java)
+            intent.putExtra("Home", home)
+            intent.putExtra("TASK", tarea)
+            intent.putExtra("Accion", "EDITAR")
+            startActivity(intent)
+        }
 
     }
-
-
 }
 
-class TaskDetailAdapter(
+class MiembroTareaAdapter(
     private val context: Context,
-    private val tasks: List<Task>,
-    private val home: Home,
-    private val dia: String) : BaseAdapter() {
-    override fun getCount(): Int = tasks.size
-    override fun getItem(position: Int): Any = tasks[position]
+    private val tarea: Task,
+    private val home: Home
+) : BaseAdapter() {
+
+    private val miembros = tarea.assignments.keys.toList()
+    private val nombresMiembros = mutableMapOf<String, String?>()
+
+    init {
+        cargarNombresMiembros()
+    }
+
+    private fun cargarNombresMiembros() {
+        val db = FirebaseDatabase.getInstance().reference
+        miembros.forEach { miembroId ->
+            db.child("members").child(miembroId).child("name")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        nombresMiembros[miembroId] = snapshot.getValue(String::class.java)
+                        notifyDataSetChanged() // <- Esto actualiza la vista cuando llegue el nombre
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        nombresMiembros[miembroId] = "(Error)"
+                        notifyDataSetChanged()
+                    }
+                })
+        }
+    }
+
+    override fun getCount(): Int = miembros.size
+    override fun getItem(position: Int): Any = miembros[position]
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_task_detail, parent, false)
+        val view = convertView ?: LayoutInflater.from(context)
+            .inflate(R.layout.item_task_detail, parent, false)
 
-        val task = tasks[position]
+        val miembroId = miembros[position]
+        val dias = tarea.assignments[miembroId] ?: emptyMap()
 
-        val btnTarea = view.findViewById<ImageView>(R.id.btnCompletarTareaDetail)
         val tvMiembro = view.findViewById<TextView>(R.id.tvMiembroDetail)
-        if(home?.editable == true){
-            btnTarea.isEnabled = true
-            btnTarea.alpha = 1.0f
-        }else{
+        val checkBoxes = mapOf(
+            "Lunes" to view.findViewById<CheckBox>(R.id.cbLunes),
+            "Martes" to view.findViewById<CheckBox>(R.id.cbMartes),
+            "Miércoles" to view.findViewById<CheckBox>(R.id.cbMiercoles),
+            "Jueves" to view.findViewById<CheckBox>(R.id.cbJueves),
+            "Viernes" to view.findViewById<CheckBox>(R.id.cbViernes),
+            "Sábado" to view.findViewById<CheckBox>(R.id.cbSabado),
+            "Domingo" to view.findViewById<CheckBox>(R.id.cbDomingo)
+        )
 
-            //Se obtiene el usuario actual de le sesion, para poder tansformar su id
-            // En el nombre que sal en cada tarea
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            val uid = currentUser?.uid
-            Log.d("UID", "UID del usuario actual: $uid")
+        checkBoxes.values.forEach { it.isChecked = false }
 
-            //valida que sea el mismo usuario que creo la tarea
-            if (uid != null && task.assignments.containsKey(uid)) {
-                Log.d("TAREAENCONTRADA","Se encontró el mismo uid")
-                val diasUsuario = task.assignments[uid]
-                val estado = diasUsuario?.get(dia)
-
-                if (estado == true) {
-                    Log.d("TAREA_COMPLETADA", "La tarea '${task.titulo}' está completada.")
-                    btnTarea.isEnabled = false
-                    btnTarea.alpha = 0.0f
-                } else {
-                    btnTarea.isEnabled = true
-                    btnTarea.alpha = 1.0f
-                    Log.d("TAREA_NO_COMPLETADA", "La tarea '${task.titulo}' NO está completada.")
-                }
-
-
-            } else {
-                btnTarea.isEnabled = false
-                btnTarea.alpha = 0.0f
-                Log.d("TAREANOENCONTRADA","No se encontró el mismo uid")
-            }
+        // Marcamos los dias aignados
+        checkBoxes.forEach { (diaEsperado, checkBox) ->
+            checkBox.isChecked = dias.containsKey(diaEsperado)
         }
-        btnTarea.setOnClickListener {
-            AlertDialog.Builder(context)
-                .setTitle("¿Completar tarea?")
-                .setMessage("¿Deseas marcar esta tarea como completada?")
-                .setPositiveButton("Sí") { _, _ ->
-                    completarTarea(task, dia)
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
+        obtenerNombreMiembroPorId(miembroId) { nombre ->
+            tvMiembro.text = nombre ?: "(Miembro no encontrado)"
         }
 
-        val assignedMemberId = task.assignments.entries.find { (_, dias) -> dias.containsKey(dia) }?.key
-
-        if (assignedMemberId != null) {
-            obtenerNombreMiembroPorId(assignedMemberId) { nombre ->
-                tvMiembro.text = nombre ?: "(Miembro no encontrado)"
-            }
-        } else {
-            tvMiembro.text = "(Sin asignar)"
-        }
+        val btnCompletar =
+            view.findViewById<ImageButton>(R.id.btnCompletarTareaDetail) // Nada por q aqui no se usa pero por estetica lo dejo
 
         return view
-    }
-
-    fun completarTarea(tarea: Task, dia: String) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val uid = currentUser?.uid ?: return
-
-        val db = FirebaseDatabase.getInstance().reference
-        val tareaRef = db.child("tasks").child(tarea.id)
-
-        // Cambiar el estado de la tarea a true para ese usuario y ese día
-        tareaRef.child("assignments").child(uid).child(dia).setValue(true)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Tarea completada", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(context, "Error al completar tarea", Toast.LENGTH_SHORT).show()
-            }
     }
 
     fun obtenerNombreMiembroPorId(miembroId: String, callback: (String?) -> Unit) {
@@ -174,7 +161,6 @@ class TaskDetailAdapter(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("FIREBASE", "Error al obtener nombre del miembro", error.toException())
                     callback(null)
                 }
             })
@@ -182,4 +168,6 @@ class TaskDetailAdapter(
 
 
 }
+
+
 
