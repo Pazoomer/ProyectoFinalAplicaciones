@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         val db = FirebaseDatabase.getInstance().reference
         val homeIdActual = home?.id ?: return
 
-        // Inicializamos todos los días con listas vacías
+
         val diasSemana = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
 
         tareasPorDia.clear()
@@ -109,6 +109,10 @@ class MainActivity : AppCompatActivity() {
         db.child("tasks").orderByChild("homeId").equalTo(homeIdActual)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    for (dia in diasSemana) {
+                        tareasPorDia[dia]?.clear()
+                    }
+
                     for (taskSnapshot in snapshot.children) {
                         val task = taskSnapshot.getValue(Task::class.java)
                         if (task != null) {
@@ -256,6 +260,7 @@ class MainActivity : AppCompatActivity() {
                 holder.tvTituloTarea.text = "(Tarea sin título)"
             }
 
+            //Dudoso
             val miembroId = tarea.assignments.keys.firstOrNull()
 
             if (miembroId != null) {
@@ -274,9 +279,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 holder.tvDescripcionTarea.text = "(Tarea sin descripción)"
             }
-
-
-
 
 
             if(home?.editable == true){
@@ -325,10 +327,11 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-
             holder.itemView.setOnClickListener {
                 val intent = Intent(context, TaskDetail::class.java)
                 intent.putExtra("TASK", tarea)
+                intent.putExtra("HOME", home)
+
                 context.startActivity(intent)
             }
 
