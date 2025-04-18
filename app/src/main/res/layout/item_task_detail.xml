@@ -29,190 +29,188 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginEnd="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_marginEnd="15dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <!-- Día Lunes -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
-            android:gravity="center">
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="L"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbLunes"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <!-- Día Martes -->
         <LinearLayout
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ma"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbMartes"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <!-- Día Miércoles -->
         <LinearLayout
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Mi"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbMiercoles"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <!-- Día Jueves -->
         <LinearLayout
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="J"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbJueves"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <!-- Día Viernes -->
         <LinearLayout
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="V"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbViernes"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <!-- Día Sábado -->
         <LinearLayout
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="S"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbSabado"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <!-- Día Domingo -->
         <LinearLayout
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="D"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/cbDomingo"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:buttonTint="@color/black"
-                android:enabled="false"/>
+                android:enabled="false" />
         </LinearLayout>
 
     </LinearLayout>
-            <ImageButton
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@drawable/task_button"
-                android:gravity="center"
-                android:padding="0dp" />
 
-
-
+    <ImageButton
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/task_button"
+        android:gravity="center"
+        android:padding="0dp" />
 
 
 </LinearLayout>

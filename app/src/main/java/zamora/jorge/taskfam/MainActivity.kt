@@ -9,13 +9,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -32,6 +36,8 @@ class MainActivity : AppCompatActivity() {
     private var mostrarSoloHoy = false
     private var home: Home? = null
     private lateinit var dayAdapter: DayAdapter
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         window.statusBarColor = Color.BLACK
 
-        dayAdapter = DayAdapter(this, emptyList(), tareasPorDia)
+        dayAdapter = DayAdapter(this, emptyList(), tareasPorDia, home)
         binding.lvDias.layoutManager = LinearLayoutManager(this)
         binding.lvDias.adapter = dayAdapter
 
@@ -93,29 +99,26 @@ class MainActivity : AppCompatActivity() {
         val homeIdActual = home?.id ?: return
 
         // Inicializamos todos los días con listas vacías
-        val diasSemana = listOf("lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo")
+        val diasSemana = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+
         tareasPorDia.clear()
         for (dia in diasSemana) {
             tareasPorDia[dia] = mutableListOf()
         }
 
         db.child("tasks").orderByChild("homeId").equalTo(homeIdActual)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (taskSnapshot in snapshot.children) {
                         val task = taskSnapshot.getValue(Task::class.java)
                         if (task != null) {
                             for ((_, diasYEstado) in task.assignments) {
                                 for ((diaRaw, _) in diasYEstado) {
-                                    val diaNormalizado = diaRaw.lowercase()
-                                        .replace("á", "a")
-                                        .replace("é", "e")
-                                        .replace("í", "i")
-                                        .replace("ó", "o")
-                                        .replace("ú", "u")
+                                    val diaLimpio = diaRaw.trim()
 
-                                    tareasPorDia[diaNormalizado]?.add(task)
-                                    Log.d("TAREAS", "Tarea agregada al día $diaNormalizado: $task")
+                                    tareasPorDia[diaLimpio]?.add(task)
+
+                                    Log.d("TAREAS", "Tarea agregada al día $diaLimpio: $task")
                                     Log.d("TAREAS", "Esta tarea es de: ${task.assignments.toString()}")
                                 }
                             }
@@ -145,15 +148,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun obtenerDiaActual(): String {
-        val dias = listOf("domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado")
+        val dias = listOf("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
         val calendar = Calendar.getInstance()
         return dias[calendar.get(Calendar.DAY_OF_WEEK) - 1]
     }
 
+
     class DayAdapter(
         private val context: Context,
         private var dias: List<String>,
-        private val tareasPorDia: Map<String, List<Task>>
+        private val tareasPorDia: Map<String, List<Task>>,
+        private val home: Home?
     ) : RecyclerView.Adapter<DayAdapter.DayViewHolder>() {
 
         class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -173,7 +178,7 @@ class MainActivity : AppCompatActivity() {
             holder.tvNombreDia.text = dia
 
             val tareasDelDia = tareasPorDia[dia] ?: emptyList()
-            val taskAdapter = TaskAdapter(context, tareasDelDia, dia)
+            val taskAdapter = TaskAdapter(context, tareasDelDia, dia, home)
 
             holder.rvTareas.layoutManager = LinearLayoutManager(context)
             holder.rvTareas.adapter = taskAdapter
@@ -191,14 +196,16 @@ class MainActivity : AppCompatActivity() {
     class TaskAdapter(
         private val context: Context,
         private val tareas: List<Task>,
-        private val dia: String
+        private val dia: String,
+        private val home: Home?
     ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
         class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvTituloTarea: TextView = view.findViewById(R.id.tv_titulotarea)
             val tvDescripcionTarea: TextView = view.findViewById(R.id.tv_descripciontarea)
             val tvMiembroTarea: TextView = view.findViewById(R.id.tv_miembro)
-
+            val btnTarea: View = view.findViewById(R.id.btnCompletarTarea)
+            val tareaElemento: LinearLayout= view.findViewById(R.id.tarea)
         }
 
         fun obtenerNombreMiembroPorId(miembroId: String, callback: (String?) -> Unit) {
@@ -216,6 +223,23 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         }
+        private fun completarTarea(tarea: Task, dia: String) {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val uid = currentUser?.uid ?: return
+
+            val db = FirebaseDatabase.getInstance().reference
+            val tareaRef = db.child("tasks").child(tarea.id)
+
+            // Cambiar el estado de la tarea a true para ese usuario y ese día
+            tareaRef.child("assignments").child(uid).child(dia).setValue(true)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Tarea completada", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, "Error al completar tarea", Toast.LENGTH_SHORT).show()
+                }
+        }
+
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
             val view = LayoutInflater.from(context).inflate(R.layout.item_task_list, parent, false)
@@ -251,12 +275,62 @@ class MainActivity : AppCompatActivity() {
                 holder.tvDescripcionTarea.text = "(Tarea sin descripción)"
             }
 
+
+
+
+
+            if(home?.editable == true){
+                holder.btnTarea.isEnabled = true
+                holder.btnTarea.alpha = 1.0f
+            }else{
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                val uid = currentUser?.uid
+                Log.d("UID", "UID del usuario actual: $uid")
+
+                if (uid != null && tarea.assignments.containsKey(uid)) {
+                    Log.d("TAREAENCONTRADA","Se encontró el mismo uid")
+                    val diasUsuario = tarea.assignments[uid]
+                    val estado = diasUsuario?.get(dia)
+
+                    if (estado == true) {
+                        Log.d("TAREA_COMPLETADA", "La tarea '${tarea.titulo}' está completada.")
+                        holder.tareaElemento.setBackgroundResource(R.drawable.background_green)
+                        holder.btnTarea.isEnabled = false
+                        holder.btnTarea.alpha = 0.0f
+                    } else {
+                        holder.btnTarea.isEnabled = true
+                        holder.btnTarea.alpha = 1.0f
+                        Log.d("TAREA_NO_COMPLETADA", "La tarea '${tarea.titulo}' NO está completada.")
+                    }
+
+
+                } else {
+                    holder.btnTarea.isEnabled = false
+                    holder.btnTarea.alpha = 0.0f
+                    Log.d("TAREANOENCONTRADA","No se encontró el mismo uid")
+                }
+            }
+
+
+
+            holder.btnTarea.setOnClickListener {
+                AlertDialog.Builder(context)
+                    .setTitle("¿Completar tarea?")
+                    .setMessage("¿Deseas marcar esta tarea como completada?")
+                    .setPositiveButton("Sí") { _, _ ->
+                        completarTarea(tarea, dia)
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
+            }
+
+
+
             holder.itemView.setOnClickListener {
                 val intent = Intent(context, TaskDetail::class.java)
                 intent.putExtra("TASK", tarea)
                 context.startActivity(intent)
             }
-
 
         }
 
