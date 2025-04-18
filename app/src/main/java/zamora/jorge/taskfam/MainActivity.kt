@@ -3,12 +3,14 @@ package zamora.jorge.taskfam
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -26,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.tasks.await
 import zamora.jorge.taskfam.data.Home
+import zamora.jorge.taskfam.data.Member
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityMainBinding
 
@@ -210,46 +213,10 @@ class MainActivity : AppCompatActivity() {
             val tvMiembroTarea: TextView = view.findViewById(R.id.tv_miembro)
             val btnTarea: View = view.findViewById(R.id.btnCompletarTarea)
             val tareaElemento: LinearLayout= view.findViewById(R.id.tarea)
+            val ivMembercolor: ImageView = view.findViewById(R.id.ivMembercolor)
         }
 
-        fun obtenerNombreMiembroPorId(miembroId: String, callback: (String?) -> Unit) {
-            val db = FirebaseDatabase.getInstance().reference
-            db.child("members").child(miembroId).child("name")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val nombre = snapshot.getValue(String::class.java)
-                        callback(nombre)
-                    }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.e("FIREBASE", "Error al obtener nombre del miembro", error.toException())
-                        callback(null)
-                    }
-                })
-        }
-        private fun completarTarea(tarea: Task, dia: String) {
-            val miembroAsignadoId = tarea.assignments.entries.firstOrNull { entry ->
-                entry.value.containsKey(dia)
-            }?.key
-
-            if (miembroAsignadoId == null) {
-                Toast.makeText(context, "No se encontró un miembro asignado para este día", Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            val db = FirebaseDatabase.getInstance().reference
-            val tareaRef = db.child("tasks").child(tarea.id)
-
-            // Cambiar el estado de la tarea a true para el miembro asignado y ese día
-            tareaRef.child("assignments").child(miembroAsignadoId).child(dia).setValue(true)
-                .addOnSuccessListener {
-                    Toast.makeText(context.applicationContext, "Tarea completada", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(context.applicationContext, "Error al completar tarea", Toast.LENGTH_SHORT).show()
-                }
-
-        }
 
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -265,10 +232,15 @@ class MainActivity : AppCompatActivity() {
             holder.tvTituloTarea.text = tarea.titulo.ifBlank { "(Tarea sin título)" }
             holder.tvDescripcionTarea.text = tarea.descripcion.ifBlank { "(Tarea sin descripción)" }
 
+
             val miembroId = tarea.assignments.keys.firstOrNull()
             if (miembroId != null) {
-                obtenerNombreMiembroPorId(miembroId) { nombre ->
-                    holder.tvMiembroTarea.text = nombre ?: "(Miembro no encontrado)"
+                obtenerMiembroPorId(miembroId) { miembro ->
+                    holder.tvMiembroTarea.text = miembro?.name ?: "(Miembro no encontrado)"
+
+                    val color = miembro?.color ?: Color.GRAY
+                    val background = holder.ivMembercolor.background as GradientDrawable
+                    background.setColor(color)
                 }
             } else {
                 holder.tvMiembroTarea.text = "(No hay miembro asignado)"
@@ -324,6 +296,46 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("HOME", home)
                 context.startActivity(intent)
             }
+        }
+
+        fun obtenerMiembroPorId(miembroId: String, callback: (Member?) -> Unit) {
+            val db = FirebaseDatabase.getInstance().reference
+            db.child("members").child(miembroId)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val miembro = snapshot.getValue(Member::class.java)?.copy(id = miembroId)
+                        callback(miembro)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("FIREBASE", "Error al obtener el miembro", error.toException())
+                        callback(null)
+                    }
+                })
+        }
+
+        private fun completarTarea(tarea: Task, dia: String) {
+            val miembroAsignadoId = tarea.assignments.entries.firstOrNull { entry ->
+                entry.value.containsKey(dia)
+            }?.key
+
+            if (miembroAsignadoId == null) {
+                Toast.makeText(context, "No se encontró un miembro asignado para este día", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val db = FirebaseDatabase.getInstance().reference
+            val tareaRef = db.child("tasks").child(tarea.id)
+
+            // Cambiar el estado de la tarea a true para el miembro asignado y ese día
+            tareaRef.child("assignments").child(miembroAsignadoId).child(dia).setValue(true)
+                .addOnSuccessListener {
+                    Toast.makeText(context.applicationContext, "Tarea completada", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context.applicationContext, "Error al completar tarea", Toast.LENGTH_SHORT).show()
+                }
+
         }
 
     }

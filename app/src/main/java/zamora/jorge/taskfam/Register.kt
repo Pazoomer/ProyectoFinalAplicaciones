@@ -20,6 +20,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
 import com.google.firebase.database.FirebaseDatabase
 import zamora.jorge.taskfam.data.Member
+import kotlin.random.Random
 
 class Register : AppCompatActivity() {
 
@@ -112,6 +113,7 @@ class Register : AppCompatActivity() {
             return
         }
 
+
         //TODO: Revisar credenciales repetidas en la base de datos y registrarlo si no es asi
 
         //Cambiar actividad
@@ -120,13 +122,20 @@ class Register : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun generarColorAleatorio(): Int {
+        val r = Random.nextInt(0, 256)
+        val g = Random.nextInt(0, 256)
+        val b = Random.nextInt(0, 256)
+        return Color.argb(255, r, g, b)
+    }
+
     private fun sigIn(email: String, password: String, name: String, error: TextView) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
                 val user = auth.currentUser
                 user?.let {
                     val uid = user.uid
-                    val member = Member(id = uid, name = name, email = email)
+                    val member = Member(id = uid, name = name, email = email, color = generarColorAleatorio())
 
                     val database = FirebaseDatabase.getInstance().reference
                     database.child("members").child(uid).setValue(member)
