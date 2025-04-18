@@ -4,10 +4,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityLoginBinding
 import zamora.jorge.taskfam.databinding.ActivityTaskDetailBinding
 
@@ -25,16 +27,22 @@ class TaskDetail : AppCompatActivity() {
 
         window.statusBarColor = Color.BLACK
 
+
         binding = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val tarea = intent.getParcelableExtra<Task>("TASK")
+        binding.tvMiembro.text = tarea?.assignments?.keys?.firstOrNull() ?: "Miembro no encontrado"
+        binding.tvTitulotarea.text = tarea?.titulo ?: "Tarea sin título"
+        binding.tvDescripcion.text = tarea?.descripcion ?: "Tarea sin descripción"
+
+        Log.d("TAREA", tarea.toString())
 
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
-        //TODO: RECIBIR DATOS DEL INTENT
 
-        //TODO: COLOCARLE LOS DATOS A LAS VISTAS
     }
 }

@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         home = intent.getParcelableExtra("HOME")
+        binding.tvCasanombreMain.text = home?.nombre ?: "(Sin nombre)"
+
         window.statusBarColor = Color.BLACK
 
         dayAdapter = DayAdapter(this, emptyList(), tareasPorDia)
@@ -196,6 +198,7 @@ class MainActivity : AppCompatActivity() {
             val tvTituloTarea: TextView = view.findViewById(R.id.tv_titulotarea)
             val tvDescripcionTarea: TextView = view.findViewById(R.id.tv_descripciontarea)
             val tvMiembroTarea: TextView = view.findViewById(R.id.tv_miembro)
+
         }
 
         fun obtenerNombreMiembroPorId(miembroId: String, callback: (String?) -> Unit) {
@@ -204,7 +207,7 @@ class MainActivity : AppCompatActivity() {
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val nombre = snapshot.getValue(String::class.java)
-                        callback(nombre) // Devuelve el nombre por callback
+                        callback(nombre)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -240,6 +243,21 @@ class MainActivity : AppCompatActivity() {
             } else {
                 holder.tvMiembroTarea.text = "(No hay miembro asignado)"
             }
+
+            if (!tarea.descripcion.isNullOrBlank()) {
+                holder.tvDescripcionTarea.text = tarea.descripcion
+
+            } else {
+                holder.tvDescripcionTarea.text = "(Tarea sin descripción)"
+            }
+
+            holder.itemView.setOnClickListener {
+                val intent = Intent(context, TaskDetail::class.java)
+                intent.putExtra("TASK", tarea)
+                context.startActivity(intent)
+            }
+
+
         }
 
     }
