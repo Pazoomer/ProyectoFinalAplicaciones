@@ -193,25 +193,25 @@ class AddEdit : AppCompatActivity() {
 
             // Solo agregamos los días seleccionados
             if (miembro.diasSeleccionados.containsKey("Lunes")) {
-                diasSeleccionados["Lunes"] = miembro.diasSeleccionados["Lunes"] ?: false
+                diasSeleccionados["Lunes"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Martes")) {
-                diasSeleccionados["Martes"] = miembro.diasSeleccionados["Martes"] ?: false
+                diasSeleccionados["Martes"]= false
             }
             if (miembro.diasSeleccionados.containsKey("Miércoles")) {
-                diasSeleccionados["Miércoles"] = miembro.diasSeleccionados["Miércoles"] ?: false
+                diasSeleccionados["Miércoles"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Jueves")) {
-                diasSeleccionados["Jueves"] = miembro.diasSeleccionados["Jueves"] ?: false
+                diasSeleccionados["Jueves"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Viernes")) {
-                diasSeleccionados["Viernes"] = miembro.diasSeleccionados["Viernes"] ?: false
+                diasSeleccionados["Viernes"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Sábado")) {
-                diasSeleccionados["Sábado"] = miembro.diasSeleccionados["Sábado"] ?: false
+                diasSeleccionados["Sábado"] = false
             }
             if (miembro.diasSeleccionados.containsKey("Domingo")) {
-                diasSeleccionados["Domingo"] = miembro.diasSeleccionados["Domingo"] ?: false
+                diasSeleccionados["Domingo"] = false
             }
 
             if (diasSeleccionados.isNotEmpty()) {

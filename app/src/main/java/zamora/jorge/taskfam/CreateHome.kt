@@ -100,7 +100,7 @@ class CreateHome : AppCompatActivity() {
                 editable = edit,
                 adminId = userId,
                 members = listOf(userId),
-                adminisId = listOf(userId)
+                adminsId = listOf(userId)
             )
 
             database.child(homeId).setValue(nuevaCasa)

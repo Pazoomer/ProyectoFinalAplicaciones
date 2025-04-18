@@ -228,20 +228,27 @@ class MainActivity : AppCompatActivity() {
                 })
         }
         private fun completarTarea(tarea: Task, dia: String) {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            val uid = currentUser?.uid ?: return
+            val miembroAsignadoId = tarea.assignments.entries.firstOrNull { entry ->
+                entry.value.containsKey(dia)
+            }?.key
+
+            if (miembroAsignadoId == null) {
+                Toast.makeText(context, "No se encontró un miembro asignado para este día", Toast.LENGTH_SHORT).show()
+                return
+            }
 
             val db = FirebaseDatabase.getInstance().reference
             val tareaRef = db.child("tasks").child(tarea.id)
 
-            // Cambiar el estado de la tarea a true para ese usuario y ese día
-            tareaRef.child("assignments").child(uid).child(dia).setValue(true)
+            // Cambiar el estado de la tarea a true para el miembro asignado y ese día
+            tareaRef.child("assignments").child(miembroAsignadoId).child(dia).setValue(true)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Tarea completada", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context.applicationContext, "Tarea completada", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "Error al completar tarea", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context.applicationContext, "Error al completar tarea", Toast.LENGTH_SHORT).show()
                 }
+
         }
 
 
@@ -254,66 +261,51 @@ class MainActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
             val tarea = tareas[position]
-            if (!tarea.titulo.isNullOrBlank()) {
-                holder.tvTituloTarea.text = tarea.titulo
-            } else {
-                holder.tvTituloTarea.text = "(Tarea sin título)"
-            }
 
-            //Dudoso
+            holder.tvTituloTarea.text = tarea.titulo.ifBlank { "(Tarea sin título)" }
+            holder.tvDescripcionTarea.text = tarea.descripcion.ifBlank { "(Tarea sin descripción)" }
+
             val miembroId = tarea.assignments.keys.firstOrNull()
-
             if (miembroId != null) {
-
                 obtenerNombreMiembroPorId(miembroId) { nombre ->
-
                     holder.tvMiembroTarea.text = nombre ?: "(Miembro no encontrado)"
                 }
             } else {
                 holder.tvMiembroTarea.text = "(No hay miembro asignado)"
             }
 
-            if (!tarea.descripcion.isNullOrBlank()) {
-                holder.tvDescripcionTarea.text = tarea.descripcion
-
-            } else {
-                holder.tvDescripcionTarea.text = "(Tarea sin descripción)"
-            }
-
-
-            if(home?.editable == true){
-                holder.btnTarea.isEnabled = true
-                holder.btnTarea.alpha = 1.0f
-            }else{
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val uid = currentUser?.uid
-                Log.d("UID", "UID del usuario actual: $uid")
-
-                if (uid != null && tarea.assignments.containsKey(uid)) {
-                    Log.d("TAREAENCONTRADA","Se encontró el mismo uid")
-                    val diasUsuario = tarea.assignments[uid]
-                    val estado = diasUsuario?.get(dia)
-
-                    if (estado == true) {
-                        Log.d("TAREA_COMPLETADA", "La tarea '${tarea.titulo}' está completada.")
-                        holder.tareaElemento.setBackgroundResource(R.drawable.background_green)
-                        holder.btnTarea.isEnabled = false
-                        holder.btnTarea.alpha = 0.0f
-                    } else {
-                        holder.btnTarea.isEnabled = true
-                        holder.btnTarea.alpha = 1.0f
-                        Log.d("TAREA_NO_COMPLETADA", "La tarea '${tarea.titulo}' NO está completada.")
-                    }
-
-
-                } else {
-                    holder.btnTarea.isEnabled = false
-                    holder.btnTarea.alpha = 0.0f
-                    Log.d("TAREANOENCONTRADA","No se encontró el mismo uid")
+            // Verificar si la tarea ya está completada para ese día
+            var tareaCompletada = false
+            for ((_, diasYEstado) in tarea.assignments) {
+                if (diasYEstado[dia] == true) {
+                    tareaCompletada = true
+                    break
                 }
             }
 
+            if (tareaCompletada) {
+                holder.tareaElemento.setBackgroundResource(R.drawable.background_green)
+                holder.btnTarea.isEnabled = false
+                holder.btnTarea.alpha = 0.0f
+            } else {
+                // Si no está completada, decidir si puede completarse
+                val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+                val miembroAsignadoId = tarea.assignments.entries.firstOrNull { entry ->
+                    entry.value.containsKey(dia)
+                }?.key
 
+                val isOwnerOrAdmin = home?.adminId == currentUserId || miembroAsignadoId == currentUserId
+
+                if (home?.editable == true || isOwnerOrAdmin) {
+                    Log.d("ADMINOEDITABLE", "Tarea editable (${home?.editable}): $tarea")
+                    holder.btnTarea.isEnabled = true
+                    holder.btnTarea.alpha = 1.0f
+                } else {
+                    holder.btnTarea.isEnabled = false
+                    holder.btnTarea.alpha = 0.0f
+                    Log.d("TAREANOEDITABLE", "Tarea no editable: $tarea")
+                }
+            }
 
             holder.btnTarea.setOnClickListener {
                 AlertDialog.Builder(context)
@@ -326,15 +318,12 @@ class MainActivity : AppCompatActivity() {
                     .show()
             }
 
-
             holder.itemView.setOnClickListener {
                 val intent = Intent(context, TaskDetail::class.java)
                 intent.putExtra("TASK", tarea)
                 intent.putExtra("HOME", home)
-
                 context.startActivity(intent)
             }
-
         }
 
     }

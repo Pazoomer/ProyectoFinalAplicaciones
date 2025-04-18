@@ -11,7 +11,7 @@ data class Home(
     var editable: Boolean = true,
     var adminId:String ="",
     var members: List<String> = emptyList(),
-    var adminisId: List <String> = emptyList()
+    var adminsId: List <String> = emptyList()
 
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -33,7 +33,7 @@ data class Home(
         parcel.writeByte(if (editable) 1 else 0)
         parcel.writeString(adminId)
         parcel.writeStringList(members)
-        parcel.writeStringList(adminisId)
+        parcel.writeStringList(adminsId)
     }
 
     override fun describeContents(): Int {
