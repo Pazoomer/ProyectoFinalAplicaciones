@@ -268,7 +268,9 @@ class AddEdit : AppCompatActivity() {
                 val homeRef = FirebaseDatabase.getInstance().reference.child("homes").child(homeId)
                 homeRef.child("tasks").push().setValue(taskId)
 
-                startActivity(Intent(this, MainActivity::class.java))
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("HOME", home)
+                startActivity(intent)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al crear la tarea", Toast.LENGTH_SHORT).show()
@@ -339,7 +341,9 @@ class AddEdit : AppCompatActivity() {
                     FirebaseDatabase.getInstance().reference.child("homes").child(home?.id ?: "")
                 homeRef.child("tasks").push().setValue(tarea?.id)
 
-                startActivity(Intent(this, MainActivity::class.java))
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("HOME", home)
+                startActivity(intent)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al actualizar la tarea", Toast.LENGTH_SHORT).show()

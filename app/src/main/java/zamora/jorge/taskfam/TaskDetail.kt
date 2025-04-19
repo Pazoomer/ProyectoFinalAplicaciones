@@ -50,8 +50,6 @@ class TaskDetail : AppCompatActivity() {
         window.statusBarColor = Color.BLACK
 
 
-
-
         binding = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
