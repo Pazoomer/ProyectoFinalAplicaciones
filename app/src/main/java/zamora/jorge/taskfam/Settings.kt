@@ -64,6 +64,7 @@ class Settings : AppCompatActivity() {
 
         binding.ivBackArrow.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("HOME", home)
             startActivity(intent)
         }
 
@@ -98,6 +99,14 @@ class Settings : AppCompatActivity() {
         home?.let {
             binding.tvSubtitulo.text = "Código del hogar: ${it.code}"
             binding.etNombreHogar.setText(it.nombre)
+
+            // Seleccionar radio según el valor de editable
+            if (it.editable == true) {
+                binding.rbEdit.isChecked = true
+            } else {
+                binding.rbNoEdit.isChecked = true
+            }
+
         } ?: run {
             binding.tvSubtitulo.text = "Error: No se encontró el hogar"
         }
@@ -180,7 +189,7 @@ class Settings : AppCompatActivity() {
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.settings_member, parent, false)
 
             val tvNombre = view.findViewById<TextView>(R.id.tvNombre)
-            val checkBoxRol = view.findViewById<CheckBox>(R.id.rol)
+            // val checkBoxRol = view.findViewById<CheckBox>(R.id.rol) TODO: Revisar XML
             val btnEliminar = view.findViewById<ImageView>(R.id.btnEliminar)
 
             val miembro = data[position]

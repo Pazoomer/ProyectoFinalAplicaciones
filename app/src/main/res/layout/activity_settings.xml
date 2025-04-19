@@ -70,6 +70,43 @@
             app:cornerRadius="20dp"/>
     </LinearLayout>
 
+    <!-- TODO: Definir si sera esta manera -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp">
+        <TextView
+            android:id="@+id/txtPermissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Permisos de los miembros:"
+            android:textSize="16sp"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <RadioButton
+                android:id="@+id/rbEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Editar"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/rbNoEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No editar"/>
+        </RadioGroup>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -120,6 +157,7 @@
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
 
+            <!-- TODO: Definir si se usara o no
             <TextView
                 android:layout_marginLeft="130dp"
                 android:layout_width="wrap_content"
@@ -127,6 +165,7 @@
                 android:text="Puede editar"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
+            -->
 
         </LinearLayout>
 

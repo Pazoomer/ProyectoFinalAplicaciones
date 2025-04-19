@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.databinding.ActivityJoinHouseBinding
 
 private lateinit var binding: ActivityJoinHouseBinding
@@ -112,9 +113,7 @@ class JoinHouse : AppCompatActivity() {
                                                         "Te has unido al hogar correctamente",
                                                         Toast.LENGTH_SHORT
                                                     ).show()
-                                                    val intent = Intent(this@JoinHouse, MainActivity::class.java)
-                                                    intent.putExtra("CASA_ID", homeId)
-                                                    startActivity(intent)
+                                                    cargarHogar(homeId)
                                                 } else {
                                                     Toast.makeText(
                                                         this@JoinHouse,
@@ -160,5 +159,34 @@ class JoinHouse : AppCompatActivity() {
                     ).show()
                 }
             })
+
     }
+
+    fun cargarHogar(homeId: String){
+        val database = FirebaseDatabase.getInstance().reference
+
+        database.child("homes").child(homeId).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val home = snapshot.getValue(Home::class.java)
+                if (home != null) {
+                    Toast.makeText(
+                        this@JoinHouse,
+                        "Te has unido al hogar correctamente",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    val intent = Intent(this@JoinHouse, MainActivity::class.java)
+                    intent.putExtra("HOME", home)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this@JoinHouse, "No se pudo cargar la información del hogar", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this@JoinHouse, "El hogar no existe", Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener {
+            Toast.makeText(this@JoinHouse, "Error al obtener el hogar", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 }

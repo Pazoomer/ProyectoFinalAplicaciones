@@ -16,11 +16,13 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+    <!-- TODO: Definir si se usara o no
     <CheckBox
         android:id="@+id/rol"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp" />
+    -->
 
     <ImageView
         android:id="@+id/btnEliminar"

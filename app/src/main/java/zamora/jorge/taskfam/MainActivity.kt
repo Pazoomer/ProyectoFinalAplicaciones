@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -41,7 +42,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dayAdapter: DayAdapter
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -54,8 +54,18 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val auth = FirebaseAuth.getInstance()
+        val currentUserId = auth.currentUser?.uid
 
         home = intent.getParcelableExtra("HOME")
+
+        // Admin?
+        if (home?.adminId != currentUserId) {
+            binding.ivSettings.visibility = View.GONE
+        } else {
+            binding.ivSettings.visibility = View.VISIBLE
+        }
+
         binding.tvCasanombreMain.text = home?.nombre ?: "(Sin nombre)"
 
         window.statusBarColor = Color.BLACK
@@ -80,6 +90,16 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, CreateJoinHome::class.java))
         }
 
+        val esAdmin = home?.adminId == currentUserId
+        val esEditable = home?.editable == true
+
+        // Editable?
+        if (!esEditable && !esAdmin) {
+            binding.addTask.visibility = View.GONE
+        } else {
+            binding.addTask.visibility = View.VISIBLE
+        }
+
         binding.addTask.setOnClickListener {
             val intent = Intent(this, AddEdit::class.java)
             intent.putExtra("Home", home)
@@ -102,7 +122,8 @@ class MainActivity : AppCompatActivity() {
         val homeIdActual = home?.id ?: return
 
 
-        val diasSemana = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+        val diasSemana =
+            listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
 
         tareasPorDia.clear()
         for (dia in diasSemana) {
@@ -126,7 +147,10 @@ class MainActivity : AppCompatActivity() {
                                     tareasPorDia[diaLimpio]?.add(task)
 
                                     Log.d("TAREAS", "Tarea agregada al día $diaLimpio: $task")
-                                    Log.d("TAREAS", "Esta tarea es de: ${task.assignments.toString()}")
+                                    Log.d(
+                                        "TAREAS",
+                                        "Esta tarea es de: ${task.assignments.toString()}"
+                                    )
                                 }
                             }
                         }
@@ -141,8 +165,6 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
-
-
 
 
     private fun getDiasMostrados(): List<String> {
@@ -171,6 +193,8 @@ class MainActivity : AppCompatActivity() {
         class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvNombreDia: TextView = view.findViewById(R.id.tv_dia)
             val rvTareas: RecyclerView = view.findViewById(R.id.lv_tareas)
+            val progressBar: ProgressBar = view.findViewById(R.id.pbTareasCompletadas)
+            val tvProgresoTexto: TextView = view.findViewById(R.id.tvProgresoTexto)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
@@ -189,6 +213,24 @@ class MainActivity : AppCompatActivity() {
 
             holder.rvTareas.layoutManager = LinearLayoutManager(context)
             holder.rvTareas.adapter = taskAdapter
+
+            var totalAsignaciones = 0
+            var completadas = 0
+
+            for (tarea in tareasDelDia) {
+                for ((_, diasYEstado) in tarea.assignments) {
+                    if (diasYEstado.containsKey(dia)) {
+                        totalAsignaciones++
+                        if (diasYEstado[dia] == true) {
+                            completadas++
+                        }
+                    }
+                }
+            }
+
+            holder.progressBar.max = if (totalAsignaciones == 0) 1 else totalAsignaciones
+            holder.progressBar.progress = completadas
+            holder.tvProgresoTexto.text = "$completadas/$totalAsignaciones"
         }
 
         fun updateList(nuevaLista: List<String>) {
@@ -196,8 +238,6 @@ class MainActivity : AppCompatActivity() {
             notifyDataSetChanged()
         }
     }
-
-
 
 
     class TaskAdapter(
@@ -212,11 +252,9 @@ class MainActivity : AppCompatActivity() {
             val tvDescripcionTarea: TextView = view.findViewById(R.id.tv_descripciontarea)
             val tvMiembroTarea: TextView = view.findViewById(R.id.tv_miembro)
             val btnTarea: View = view.findViewById(R.id.btnCompletarTarea)
-            val tareaElemento: LinearLayout= view.findViewById(R.id.tarea)
+            val tareaElemento: LinearLayout = view.findViewById(R.id.tarea)
             val ivMembercolor: ImageView = view.findViewById(R.id.ivMembercolor)
         }
-
-
 
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -265,7 +303,8 @@ class MainActivity : AppCompatActivity() {
                     entry.value.containsKey(dia)
                 }?.key
 
-                val isOwnerOrAdmin = home?.adminId == currentUserId || miembroAsignadoId == currentUserId
+                val isOwnerOrAdmin =
+                    home?.adminId == currentUserId || miembroAsignadoId == currentUserId
 
                 if (home?.editable == true || isOwnerOrAdmin) {
                     Log.d("ADMINOEDITABLE", "Tarea editable (${home?.editable}): $tarea")
@@ -321,7 +360,11 @@ class MainActivity : AppCompatActivity() {
             }?.key
 
             if (miembroAsignadoId == null) {
-                Toast.makeText(context, "No se encontró un miembro asignado para este día", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "No se encontró un miembro asignado para este día",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return
             }
 
@@ -331,10 +374,18 @@ class MainActivity : AppCompatActivity() {
             // Cambiar el estado de la tarea a true para el miembro asignado y ese día
             tareaRef.child("assignments").child(miembroAsignadoId).child(dia).setValue(true)
                 .addOnSuccessListener {
-                    Toast.makeText(context.applicationContext, "Tarea completada", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context.applicationContext,
+                        "Tarea completada",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context.applicationContext, "Error al completar tarea", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context.applicationContext,
+                        "Error al completar tarea",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
         }
