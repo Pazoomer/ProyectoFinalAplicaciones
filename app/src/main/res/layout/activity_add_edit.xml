@@ -129,7 +129,7 @@
             android:id="@+id/tvEliminar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Eliminar"
+            android:text="Eliminar tarea"
             android:textSize="20sp"
             android:textColor="@color/red"
             android:layout_gravity="center"

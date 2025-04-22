@@ -104,7 +104,6 @@
             </LinearLayout>
         </RelativeLayout>
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lv_dias"
             android:layout_width="match_parent"

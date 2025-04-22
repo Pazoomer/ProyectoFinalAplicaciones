@@ -43,7 +43,7 @@
     <string name="configuration">Configuración</string>
     <string name="enter_x_to_days">Asignar a X todos los dias</string>
     <string name="house_code">Codigo del hogar:</string>
-    <string name="members_role">Rol de los miembros</string>
+    <string name="members">Miembros</string>
     <string name="go_back">Volver al menu principal</string>
     <string name="complete_task">Completar tarea</string>
     <string name="name">Nombre</string>

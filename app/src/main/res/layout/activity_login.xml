@@ -51,6 +51,7 @@
     <EditText
         android:maxLength="254"
         android:id="@+id/etCorreo"
+        android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:hint="@string/email"

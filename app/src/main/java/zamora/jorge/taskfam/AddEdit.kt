@@ -102,14 +102,24 @@ class AddEdit : AppCompatActivity() {
         }
 
         binding.tvEliminar.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            eliminarTarea()
         }
 
         binding.ivBackArrow.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("HOME", home)
             startActivity(intent)
         }
+    }
+
+    private fun eliminarTarea(){
+        val database = FirebaseDatabase.getInstance().reference
+        database.child("tasks").child(tarea?.id ?: "").removeValue()
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("HOME", home)
+        startActivity(intent)
+        finish()
     }
 
 

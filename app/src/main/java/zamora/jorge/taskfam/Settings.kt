@@ -57,8 +57,6 @@ class Settings : AppCompatActivity() {
 
         home = intent.getParcelableExtra<Home>("HOME")
 
-        //TODO: Si el usuario no es creador del hogar, no dejarle editar nada
-
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -69,30 +67,14 @@ class Settings : AppCompatActivity() {
         }
 
         binding.tvBorrarHogar.setOnClickListener {
-            val intent = Intent(this, Login::class.java)
-            startActivity(intent)
+            borrarCasa()
         }
 
-        binding.etNombreHogar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // No es necesario implementar este método
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // No es necesario implementar este método
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                guardarNombre(s.toString())
-            }
-        })
-
-        //home = intent.getParcelableExtra<Home>("HOME")
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().reference.child("members")
+
+        database = FirebaseDatabase.getInstance().reference
 
         getMembers()
-        //colocarDatosEjemplo()
 
         binding.tvSubtitulo.text = "Codigo del hogar: ${home!!.code}"
 
@@ -109,6 +91,33 @@ class Settings : AppCompatActivity() {
 
         } ?: run {
             binding.tvSubtitulo.text = "Error: No se encontró el hogar"
+        }
+
+        binding.etNombreHogar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No es necesario implementar este método
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // No es necesario implementar este método
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                guardarNombre(s.toString())
+            }
+        })
+
+        binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rbEdit -> {
+                    home?.editable = true
+                    guardarEditable(true)
+                }
+                R.id.rbNoEdit -> {
+                    home?.editable = false
+                    guardarEditable(false)
+                }
+            }
         }
     }
 
@@ -130,7 +139,7 @@ class Settings : AppCompatActivity() {
         val membersHome = mutableListOf<Member>()
 
         for (memberId in membersIds) {
-            database.child(memberId).addListenerForSingleValueEvent(object : ValueEventListener {
+            database.child("members").child(memberId).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
                         val member = snapshot.getValue(Member::class.java)
@@ -139,7 +148,7 @@ class Settings : AppCompatActivity() {
 
                     if (membersHome.size == membersIds.size) {
                         val listView = findViewById<ListView>(R.id.listViewMiembros)
-                        val adapter = MiembroAdapter(this@Settings, membersHome)
+                        val adapter = MiembroAdapter(this@Settings, membersHome, home!!, database, auth)
                         listView.adapter = adapter
                     }
                 }
@@ -152,32 +161,105 @@ class Settings : AppCompatActivity() {
     }
 
     fun guardarNombre(texto: String) {
-        //Comprobar que no esté vacío
+        //Verificar que no este vacio
         if (texto.isEmpty()) {
-            Toast.makeText(this, "Por favor ingrese un nombre", Toast.LENGTH_SHORT).show()
+            showError("Por favor ingrese un nombre")
             return
         }
 
-        //TODO: Guardar el nombre del hogar en la base de datos
-        Toast.makeText(this, "Texto actualizado: $texto", Toast.LENGTH_SHORT).show()
+        //Usuario autentificado
+        val userId = auth.currentUser?.uid ?: run {
+            showError("Error: Usuario no autenticado")
+            return
+        }
+
+        //Veririfcar que el hogar existe
+        val homeId = home?.id ?: run {
+            showError("Error: No se encontró el ID del hogar")
+            return
+        }
+
+        //Cambiarle el nombre al hogar
+        database.child("homes").child(homeId).child("nombre").setValue(texto)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Nombre actualizado exitosamente", Toast.LENGTH_SHORT).show()
+                home!!.nombre = texto
+            }
+            .addOnFailureListener { e ->
+                showError("Error al actualizar el nombre: ${e.message}")
+            }
     }
 
-    /*
-    fun colocarDatosEjemplo(){
-        val listView = findViewById<ListView>(R.id.listViewMiembros)
-        val datosEjemplo = listOf(
-            Member("Juan", true),
-            Member("María", false),
-            Member("Carlos", true),
-            Member("Ana", false),
-            Member("Luis", true)
-        )
+    fun guardarEditable(editable: Boolean) {
+        val userId = auth.currentUser?.uid ?: run {
+            showError("Error: Usuario no autenticado")
+            return
+        }
 
-        val adapter = MiembroAdapter(this, datosEjemplo)
-        listView.adapter = adapter
-    }*/
+        val homeId = home?.id ?: run {
+            showError("Error: No se encontró el ID del hogar")
+            return
+        }
 
-    class MiembroAdapter(private val context: Context, private val data: List<Member>) : BaseAdapter() {
+        database.child("homes").child(homeId).child("editable").setValue(editable)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Permiso de edición actualizado", Toast.LENGTH_SHORT).show()
+                home!!.editable = editable
+            }
+            .addOnFailureListener { e ->
+                showError("Error al actualizar editable: ${e.message}")
+            }
+    }
+
+    private fun borrarCasa(){
+        //Usuario autentificado
+        val userId = auth.currentUser?.uid ?: run {
+            showError("Error: Usuario no autenticado")
+            return
+        }
+
+        //Veririfcar que el hogar existe
+        val homeId = home?.id ?: run {
+            showError("Error: No se encontró el ID del hogar")
+            return
+        }
+
+        // Eliminar las tareas con ese homeId
+        database.child("tasks").orderByChild("homeId").equalTo(homeId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (taskSnapshot in snapshot.children) {
+                        taskSnapshot.ref.removeValue()
+                    }
+
+                    // Después de borrar las tasks, borrar la casa
+                    database.child("homes").child(homeId).removeValue()
+                        .addOnSuccessListener {
+                            Toast.makeText(this@Settings, "Hogar y tareas eliminados", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this@Settings, CreateJoinHome::class.java))
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            showError("Error al eliminar el hogar: ${e.message}")
+                        }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    showError("Error al borrar las tareas: ${error.message}")
+                }
+            })
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        println("Error: $message")
+    }
+
+    class MiembroAdapter(private val context: Context,
+                         private var data: MutableList<Member>,
+                         private val home: Home,
+                         private val database: DatabaseReference,
+                         private val auth: FirebaseAuth) : BaseAdapter() {
 
         override fun getCount(): Int = data.size
 
@@ -189,23 +271,94 @@ class Settings : AppCompatActivity() {
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.settings_member, parent, false)
 
             val tvNombre = view.findViewById<TextView>(R.id.tvNombre)
-            // val checkBoxRol = view.findViewById<CheckBox>(R.id.rol) TODO: Revisar XML
             val btnEliminar = view.findViewById<ImageView>(R.id.btnEliminar)
-
             val miembro = data[position]
 
             tvNombre.text = miembro.name
-            //checkBoxRol.isChecked = miembro.
-            //TODO: Member debe tener puede editar
-            /*
-            checkBoxRol.setOnCheckedChangeListener { _, isChecked ->
-                miembro.puedeEditar = isChecked
-            }*/
+
+            if(miembro.id==home.adminId){
+                btnEliminar.visibility = View.GONE
+            }
 
             btnEliminar.setOnClickListener {
-                Toast.makeText(context, "Eliminar a ${miembro.name}", Toast.LENGTH_SHORT).show()
+                eliminarMiembroCompletoAtomic(miembro.id, home.id) { exito ->
+                    if (exito) {
+                        data.removeAt(position)
+                        notifyDataSetChanged()
+                        Toast.makeText(context, "Miembro y tareas eliminadas", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Error al eliminar", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
             return view
+        }
+
+        fun eliminarMiembroCompletoAtomic(
+            miembroId: String,
+            homeId: String,
+            onResult: (Boolean) -> Unit
+        ) {
+            val homeRef = database.child("homes").child(homeId)
+            val tasksRef = database.child("tasks")
+            val memberTasksRef = database.child("members").child(miembroId).child("tasks")
+
+            // 1. Leer datos del hogar (adminId, lista de tareas, miembros y admins)
+            homeRef.get().addOnSuccessListener { homeSnap ->
+                val adminId = homeSnap.child("adminId").getValue(String::class.java)
+                if (adminId == miembroId) {
+                    onResult(false) // no puede eliminar al admin
+                    return@addOnSuccessListener
+                }
+                val homeTasks = homeSnap.child("tasks").children.mapNotNull { it.getValue(String::class.java) }
+                val homeMembers = homeSnap.child("members").children.mapNotNull { it.getValue(String::class.java) }
+                val homeAdmins = homeSnap.child("adminsId").children.mapNotNull { it.getValue(String::class.java) }
+
+                // 2. Leer las tareas del miembro
+                memberTasksRef.get().addOnSuccessListener { memberTasksSnap ->
+                    val memberTasks = memberTasksSnap.children.mapNotNull { it.getValue(String::class.java) }
+
+                    // Intersección de tareas hogar ∧ tareas miembro
+                    val commonTasks = homeTasks.intersect(memberTasks)
+
+                    // 3. Leer asignaciones de todas las tareas
+                    tasksRef.get().addOnSuccessListener { tasksSnap ->
+                        val updates = mutableMapOf<String, Any?>()
+                        val tasksToDelete = mutableListOf<String>()
+
+                        commonTasks.forEach { taskId ->
+                            val assignmentSnap = tasksSnap.child(taskId).child("assignments")
+                            val assignedMembers = assignmentSnap.children.mapNotNull { it.key }
+
+                            if (assignedMembers.size == 1 && assignedMembers.first() == miembroId) {
+                                // Solo él: borrar tarea
+                                tasksToDelete.add(taskId)
+                                updates["tasks/$taskId"] = null
+                            } else {
+                                // Quitar solo su asignación
+                                updates["tasks/$taskId/assignments/$miembroId"] = null
+                            }
+                            // Siempre quitar de member->tasks
+                            updates["members/$miembroId/tasks/$taskId"] = null
+                        }
+
+                        // 4. Actualizar lista de tareas del hogar sin las borradas
+                        val updatedHomeTasks = homeTasks.filterNot { tasksToDelete.contains(it) }
+                        updates["homes/$homeId/tasks"] = updatedHomeTasks
+
+                        // 5. Quitar miembro de members y adminsId del hogar
+                        val updatedHomeMembers = homeMembers.filterNot { it == miembroId }
+                        updates["homes/$homeId/members"] = updatedHomeMembers
+                        val updatedHomeAdmins = homeAdmins.filterNot { it == miembroId }
+                        updates["homes/$homeId/adminsId"] = updatedHomeAdmins
+
+                        // 6. Ejecutar todo atómicamente
+                        database.updateChildren(updates)
+                            .addOnSuccessListener { onResult(true) }
+                            .addOnFailureListener { onResult(false) }
+                    }.addOnFailureListener { onResult(false) }
+                }.addOnFailureListener { onResult(false) }
+            }.addOnFailureListener { onResult(false) }
         }
     }
 }

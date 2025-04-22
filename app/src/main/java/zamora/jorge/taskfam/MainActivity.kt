@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
     private var home: Home? = null
     private lateinit var dayAdapter: DayAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -116,8 +115,6 @@ class MainActivity : AppCompatActivity() {
 
         cargarTareasDelHogarActual()
     }
-
-
     private fun cargarTareasDelHogarActual() {
         val db = FirebaseDatabase.getInstance().reference
         val homeIdActual = home?.id ?: return
@@ -170,9 +167,6 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
-
-
-
     private fun getDiasMostrados(): List<String> {
         return if (mostrarSoloHoy) {
             val diaActual = obtenerDiaActual()
@@ -181,14 +175,11 @@ class MainActivity : AppCompatActivity() {
             tareasPorDia.keys.toList()
         }
     }
-
     private fun obtenerDiaActual(): String {
-        val dias = listOf("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+        val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado","Domingo")
         val calendar = Calendar.getInstance()
         return dias[calendar.get(Calendar.DAY_OF_WEEK) - 2]
     }
-
-
     class DayAdapter(
         private val context: Context,
         private var dias: List<String>,
@@ -209,7 +200,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getItemCount(): Int = dias.size
-
         override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
             val dia = dias[position]
             holder.tvNombreDia.text = dia
@@ -228,15 +218,17 @@ class MainActivity : AppCompatActivity() {
             holder.progressBar.max = if (totalAsignaciones == 0) 1 else totalAsignaciones
             holder.progressBar.progress = completadas
             holder.tvProgresoTexto.text = "$completadas/$totalAsignaciones"
-        }
 
+            holder.rvTareas.layoutManager = LinearLayoutManager(context)
+            holder.rvTareas.adapter = taskAdapter
+            holder.rvTareas.setHasFixedSize(false)
+            holder.rvTareas.isNestedScrollingEnabled = false
+        }
         fun updateList(nuevaLista: List<String>) {
             dias = nuevaLista
             notifyDataSetChanged()
         }
     }
-
-
     class TaskAdapter(
         private val context: Context,
         private val asignaciones: List<AsignacionPorDia>,

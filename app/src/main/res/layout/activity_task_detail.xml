@@ -15,6 +15,7 @@
         android:gravity="center_horizontal">
 
         <LinearLayout
+            android:paddingBottom="75dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -48,7 +49,8 @@
         <ListView
             android:id="@+id/lvTaskDetail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="300dp" />
+
     </LinearLayout>
 
     <ImageView
@@ -57,7 +59,7 @@
         android:layout_height="70dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="100dp"
         android:contentDescription="Editar tarea"
         android:src="@drawable/edit_task" />
 </FrameLayout>
