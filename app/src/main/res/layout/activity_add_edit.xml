@@ -53,19 +53,37 @@
                 android:background="@drawable/background_blue_sky"
                 app:cornerRadius="20dp"/>
 
-            <EditText
-                android:maxLength="50"
-                android:id="@+id/etDescripcion"
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:textSize="20sp"
-                android:hint="  Descripción breve"
-                android:textStyle="bold"
-                android:drawableStart="@drawable/desc"
-                android:paddingStart="16dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/background_blue_sky"
-                app:cornerRadius="20dp"/>
+                android:layout_height="wrap_content">
+                <EditText
+                    android:maxLength="50"
+                    android:id="@+id/etDescripcion"
+                    android:layout_width="300dp"
+                    android:layout_height="70dp"
+                    android:textSize="20sp"
+                    android:hint="  Descripción breve"
+                    android:textStyle="bold"
+                    android:drawableStart="@drawable/desc"
+                    android:paddingStart="16dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/background_blue_sky"
+                    app:cornerRadius="20dp"/>
+
+                <Button
+                    android:id="@+id/btnhora"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/purple"
+                    android:drawableTop="@drawable/baseline_person_add_24"
+                    app:cornerRadius="20dp" />
+            </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"

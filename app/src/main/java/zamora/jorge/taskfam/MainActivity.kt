@@ -1,10 +1,17 @@
 package zamora.jorge.taskfam
 
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.icu.util.Calendar
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +25,11 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity.ALARM_SERVICE
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,14 +45,16 @@ import zamora.jorge.taskfam.data.Home
 import zamora.jorge.taskfam.data.Member
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityMainBinding
+import android.Manifest
+import android.provider.Settings
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    //private val tareasPorDia: MutableMap<String, MutableList<Task>> = mutableMapOf()
     private val tareasPorDia: MutableMap<String, MutableList<AsignacionPorDia>> = mutableMapOf()
     private var mostrarSoloHoy = false
     private var home: Home? = null
     private lateinit var dayAdapter: DayAdapter
+    private val tareasProgramadas = mutableSetOf<String>() // Set para almacenar los IDs de las tareas programadas
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         cargarTareasDelHogarActual()
+        administrarNotificaciones()
     }
     private fun cargarTareasDelHogarActual() {
         val db = FirebaseDatabase.getInstance().reference
@@ -186,19 +201,16 @@ class MainActivity : AppCompatActivity() {
         private val tareasPorDia: Map<String, List<AsignacionPorDia>>,
         private val home: Home?
     ) : RecyclerView.Adapter<DayAdapter.DayViewHolder>() {
-
         class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvNombreDia: TextView = view.findViewById(R.id.tv_dia)
             val rvTareas: RecyclerView = view.findViewById(R.id.lv_tareas)
             val progressBar: ProgressBar = view.findViewById(R.id.pbTareasCompletadas)
             val tvProgresoTexto: TextView = view.findViewById(R.id.tvProgresoTexto)
         }
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
             val view = LayoutInflater.from(context).inflate(R.layout.item_day, parent, false)
             return DayViewHolder(view)
         }
-
         override fun getItemCount(): Int = dias.size
         override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
             val dia = dias[position]
@@ -235,7 +247,6 @@ class MainActivity : AppCompatActivity() {
         private val dia: String,
         private val home: Home?
     ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
-
         class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val tvTituloTarea: TextView = view.findViewById(R.id.tv_titulotarea)
             val tvDescripcionTarea: TextView = view.findViewById(R.id.tv_descripciontarea)
@@ -244,15 +255,12 @@ class MainActivity : AppCompatActivity() {
             val tareaElemento: LinearLayout = view.findViewById(R.id.tarea)
             val ivMembercolor: ImageView = view.findViewById(R.id.ivMembercolor)
         }
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
             val view = LayoutInflater.from(context)
                 .inflate(R.layout.item_task_list, parent, false)
             return TaskViewHolder(view)
         }
-
         override fun getItemCount(): Int = asignaciones.size
-
         override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
             val asignacion = asignaciones[position]
             val tarea = asignacion.tarea
@@ -306,7 +314,6 @@ class MainActivity : AppCompatActivity() {
                 context.startActivity(intent)
             }
         }
-
         private fun obtenerMiembroPorId(miembroId: String, callback: (Member?) -> Unit) {
             val db = FirebaseDatabase.getInstance().reference
             db.child("members").child(miembroId)
@@ -322,7 +329,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         }
-
         private fun completarTarea(taskId: String, miembroId: String, dia: String) {
             val db = FirebaseDatabase.getInstance().reference
             db.child("tasks")
@@ -339,5 +345,131 @@ class MainActivity : AppCompatActivity() {
                 }
         }
     }
+    private fun administrarNotificaciones() {
+        // Obtener las tareas programadas de SharedPreferences
+        val tareasProgramadas = obtenerTareasProgramadas()
+
+        // Obtener las tareas del día actual
+        val tareasDelDia = tareasPorDia[obtenerDiaActual()]
+
+        // Crear canal de notificación
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val canal = NotificationChannel(
+                "canalTareas",
+                "Canal de Tareas",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(canal)
+        }
+
+        // Pedir permiso si es Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            }
+        }
+
+        // Verificar si se pueden programar alarmas exactas (Android 12+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                startActivity(intent)
+            }
+        }
+
+        // Iterar sobre las tareas del día actual
+        tareasDelDia?.forEach { tarea ->
+            // Verificar si la tarea tiene hora
+            if (tarea.tarea.hora != 0L) { // Si hora es válida
+
+                // Verificar si la tarea ya fue programada
+                if (tareasProgramadas.contains(tarea.tarea.id)) {
+                    return@forEach // Si ya fue programada, continuar con la siguiente tarea
+                }
+
+                // Parsear la hora de la tarea
+                val calendar = Calendar.getInstance().apply {
+                    timeInMillis = tarea.tarea.hora
+                    add(Calendar.MINUTE, -30) // Restar 30 minutos para la alarma
+                }
+
+                // Crear el Intent para el BroadcastReceiver
+                val intent = Intent(this, NotificacionReceiver::class.java).apply {
+                    putExtra("nombreTarea", tarea.tarea.titulo)
+                    putExtra("horaTarea", "${tarea.tarea.hora}")
+                }
+
+                // Convertir el ID de la tarea a un hash único
+                val pendingIntentId = tarea.tarea.id.hashCode()
+
+                // Crear el PendingIntent para la alarma
+                val pendingIntent = PendingIntent.getBroadcast(
+                    this,
+                    pendingIntentId,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                // Programar la alarma
+                val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
+
+                // Marcar la tarea como programada
+                tareasProgramadas.add(tarea.tarea.id)
+            }
+        }
+        // Guardar los IDs de las tareas programadas
+        guardarTareasProgramadas(tareasProgramadas)
+    }
+    private fun obtenerTareasProgramadas(): MutableSet<String> {
+        val sharedPref = getSharedPreferences("tareas_programadas", MODE_PRIVATE)
+        // Convertir el Set a un MutableSet para poder modificarlo
+        return sharedPref.getStringSet("tareas_ids", mutableSetOf())?.toMutableSet() ?: mutableSetOf()
+    }
+    private fun guardarTareasProgramadas(tareasProgramadas: Set<String>) {
+        val sharedPref = getSharedPreferences("tareas_programadas", MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putStringSet("tareas_ids", tareasProgramadas)
+        editor.apply()
+    }
+    // Receiver que maneja las notificaciones
+    class NotificacionReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent?) {
+            // Obtener el nombre y hora de la tarea desde el Intent
+            val nombreTarea = intent?.getStringExtra("nombreTarea")
+            val horaTarea = intent?.getStringExtra("horaTarea")
+
+            // Crear la notificación
+            val builder = NotificationCompat.Builder(context, "canalTareas")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("Tarea pendiente: $nombreTarea")
+                .setContentText("Tu tarea está programada para las $horaTarea")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val notificationManager = NotificationManagerCompat.from(context)
+                notificationManager.notify(1, builder.build()) // ID de notificación
+            }
+        }
+    }
+
 }
 

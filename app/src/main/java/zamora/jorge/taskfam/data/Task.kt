@@ -8,7 +8,8 @@ data class Task(
     val titulo: String = "",
     val descripcion: String = "",
     val homeId: String = "",
-    val assignments: Map<String, Map<String, Boolean>> = emptyMap()
+    val assignments: Map<String, Map<String, Boolean>> = emptyMap(),
+    val hora: Long
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
@@ -29,7 +30,8 @@ data class Task(
                 }
                 this[memberId] = dias
             }
-        }
+        },
+        parcel.readLong()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -47,6 +49,7 @@ data class Task(
                 parcel.writeByte(if (estado) 1 else 0)
             }
         }
+        parcel.writeLong(hora)
     }
 
     override fun describeContents(): Int = 0

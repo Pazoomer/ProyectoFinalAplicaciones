@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.Spinner
@@ -28,6 +29,8 @@ import zamora.jorge.taskfam.data.Member
 import zamora.jorge.taskfam.data.MembersDay
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityAddEditBinding
+import android.app.TimePickerDialog
+import java.util.Calendar
 
 class AddEdit : AppCompatActivity() {
 
@@ -38,6 +41,7 @@ class AddEdit : AppCompatActivity() {
     private var accion: String? = ""
     private var home: Home? = null
     private var tarea: Task? = null
+    private var hora: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,8 +114,33 @@ class AddEdit : AppCompatActivity() {
             intent.putExtra("HOME", home)
             startActivity(intent)
         }
-    }
 
+        binding.btnhora.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            // Crear el TimePickerDialog
+            val timePickerDialog = TimePickerDialog(
+                this,
+                { _, selectedHour, selectedMinute ->
+                    // Otiene la hora y minuto seleccionados
+                    val selectedTime = "$selectedHour:$selectedMinute"
+                    Toast.makeText(this, "Hora seleccionada: $selectedTime", Toast.LENGTH_SHORT).show()
+
+                    // Convertirla la hora a Long
+                    val horaSeleccionada = Calendar.getInstance()
+                    horaSeleccionada.set(Calendar.HOUR_OF_DAY, selectedHour)
+                    horaSeleccionada.set(Calendar.MINUTE, selectedMinute)
+                    hora = horaSeleccionada.timeInMillis
+
+                },
+                hour, minute, true // true para formato 24 horas, false para 12 horas
+            )
+            timePickerDialog.show()
+        }
+
+    }
     private fun eliminarTarea(){
         val database = FirebaseDatabase.getInstance().reference
         database.child("tasks").child(tarea?.id ?: "").removeValue()
@@ -121,8 +150,6 @@ class AddEdit : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-
     private fun obtenerMiembrosDeHome(callback: (List<Member>) -> Unit) {
         val database = FirebaseDatabase.getInstance().reference
         val homeId = home?.id
@@ -146,7 +173,6 @@ class AddEdit : AppCompatActivity() {
                 }
             })
     }
-
     private fun obtenerMiembrosPorIds(userIds: List<String>, callback: (List<Member>) -> Unit) {
         val database = FirebaseDatabase.getInstance().reference
         val miembros = mutableListOf<Member>()
@@ -187,8 +213,6 @@ class AddEdit : AppCompatActivity() {
                 })
         }
     }
-
-
     private fun agregarHabitante() {
         if (miembrosDisponibles.isNotEmpty()) {
             val primerDisponible = miembrosDisponibles.first()
@@ -199,13 +223,11 @@ class AddEdit : AppCompatActivity() {
             Toast.makeText(this, "No hay más miembros disponibles", Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun actualizarAdapter() {
         adapter =
             MiembroAdapter(this, miembrosAsignados, miembrosDisponibles) { actualizarAdapter() }
         binding.lvMiembros.adapter = adapter
     }
-
     private fun agregarTarea() {
         val nombre = binding.etNombreTarea.text.toString()
         val descripcion = binding.etDescripcion.text.toString()
@@ -217,6 +239,10 @@ class AddEdit : AppCompatActivity() {
 
         if (miembrosAsignados.isEmpty()) {
             Toast.makeText(this, "Por favor agregue al menos un miembro", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if(hora == null){
+            Toast.makeText(this, "Por favor seleccione una hora", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -265,7 +291,8 @@ class AddEdit : AppCompatActivity() {
             titulo = nombre,
             descripcion = descripcion,
             homeId = homeId,
-            assignments = asignaciones
+            assignments = asignaciones,
+            hora = hora!!
         )
 
         // Guardamos la tarea en la base de datos
@@ -286,7 +313,6 @@ class AddEdit : AppCompatActivity() {
                 Toast.makeText(this, "Error al crear la tarea", Toast.LENGTH_SHORT).show()
             }
     }
-
     private fun actualizarTarea() {
         val nombre = binding.etNombreTarea.text.toString()
         val descripcion = binding.etDescripcion.text.toString()
@@ -339,7 +365,8 @@ class AddEdit : AppCompatActivity() {
             titulo = nombre,
             descripcion = descripcion,
             homeId = home?.id ?: "",
-            assignments = asignaciones
+            assignments = asignaciones,
+            hora = tarea?.hora?: return
         )
 
         val database = FirebaseDatabase.getInstance().reference
@@ -359,9 +386,7 @@ class AddEdit : AppCompatActivity() {
                 Toast.makeText(this, "Error al actualizar la tarea", Toast.LENGTH_SHORT).show()
             }
     }
-
 }
-
 class MiembroAdapter(
     private val context: Context,
     private val miembrosAsignados: MutableList<MembersDay>,
