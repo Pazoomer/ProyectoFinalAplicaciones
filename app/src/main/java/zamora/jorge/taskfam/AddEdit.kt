@@ -224,6 +224,8 @@ class AddEdit : AppCompatActivity() {
         val taskId = FirebaseDatabase.getInstance().reference.child("tasks").push().key ?: return
         val homeId = home?.id ?: ""
 
+        var diasTareas = false
+
         for (miembro in miembrosAsignados) {
             val diasSeleccionados = mutableMapOf<String, Boolean>()
 
@@ -251,13 +253,24 @@ class AddEdit : AppCompatActivity() {
             }
 
             if (diasSeleccionados.isNotEmpty()) {
+                diasTareas = true
                 asignaciones[miembro.member.id] = diasSeleccionados
+            } else{
+                diasTareas = false
+                Toast.makeText(this, "Todos los miembros de la tarea deben tener al menos un día", Toast.LENGTH_SHORT).show()
+                return
             }
+
+
 
             // Actualizamos el miembro con el nuevo ID de tarea
             val miembroRef =
                 FirebaseDatabase.getInstance().reference.child("members").child(miembro.member.id)
             miembroRef.child("tasks").push().setValue(taskId)
+        }
+
+        if (!diasTareas){
+            return
         }
 
         val tarea = Task(
@@ -303,6 +316,8 @@ class AddEdit : AppCompatActivity() {
 
         val asignaciones = mutableMapOf<String, Map<String, Boolean>>()
 
+        var diasTareas = false
+
         for (miembro in miembrosAsignados) {
             val diasSeleccionados = mutableMapOf<String, Boolean>()
 
@@ -330,8 +345,18 @@ class AddEdit : AppCompatActivity() {
             }
 
             if (diasSeleccionados.isNotEmpty()) {
+                diasTareas = true
                 asignaciones[miembro.member.id] = diasSeleccionados
+            } else{
+                diasTareas = false
+                Toast.makeText(this, "Todos los miembros de la tarea deben tener al menos un día", Toast.LENGTH_SHORT).show()
+                return
             }
+
+        }
+
+        if (!diasTareas){
+            return
         }
 
         val tareaActualizada = Task(
