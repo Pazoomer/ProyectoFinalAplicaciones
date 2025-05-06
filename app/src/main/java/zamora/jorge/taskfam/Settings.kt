@@ -55,29 +55,38 @@ class Settings : AppCompatActivity() {
 
         window.statusBarColor = Color.BLACK
 
+        // Obtiene el objeto Home que fue pasado como extra desde la actividad anterior (MainActivity)
         home = intent.getParcelableExtra<Home>("HOME")
 
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Listener en la flecha volver atras, que nos regres a MainActivity, con la cas actual
         binding.ivBackArrow.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("HOME", home)
             startActivity(intent)
         }
 
+        // Listener el cual llama al metodo borrarCasa
         binding.tvBorrarHogar.setOnClickListener {
             borrarCasa()
         }
 
+        // Obtenemos la instancia de autenticacion de Firebase
         auth = FirebaseAuth.getInstance()
 
+        //Obtenemos la referencia de la base de datos
         database = FirebaseDatabase.getInstance().reference
 
+        // Cargamos la lista de los miembros del hogar
         getMembers()
 
+        // Mostramos el codigo del hogar
         binding.tvSubtitulo.text = "Codigo del hogar: ${home!!.code}"
 
+        // Si el objeto Home no es nulo, muestra el nombre del hogar y configura el RadioButton
+        // según si la edición de tareas está habilitada o no
         home?.let {
             binding.tvSubtitulo.text = "Código del hogar: ${it.code}"
             binding.etNombreHogar.setText(it.nombre)
@@ -90,9 +99,11 @@ class Settings : AppCompatActivity() {
             }
 
         } ?: run {
+            // Si el objeto Home es nulo, muestra un mensaje de error
             binding.tvSubtitulo.text = "Error: No se encontró el hogar"
         }
 
+        // Listener para el EditText que permite cambiar el nombre del hogar
         binding.etNombreHogar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // No es necesario implementar este método
@@ -103,10 +114,12 @@ class Settings : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
+                // Guarda el nuevo nombre del hogar en la base de datos.
                 guardarNombre(s.toString())
             }
         })
 
+        // Listener para el RadioGroup que permite habilitar o deshabilitar la edición de tareas.
         binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rbEdit -> {
@@ -121,31 +134,44 @@ class Settings : AppCompatActivity() {
         }
     }
 
+    /**
+     * Obtiene la lista de miembros del hogar actual desde la base de datos de Firebase.
+     * Los IDs de los miembros se obtienen de la lista 'members' dentro del nodo del hogar.
+     * Luego, se consulta la información detallada de cada miembro utilizando su ID.
+     * Finalmente, se muestra la lista de miembros en un ListView utilizando un adaptador personalizado.
+     */
     fun getMembers() {
 
+        // Verificamos si el hogar no es nullo
         if(home==null){
             return
         }else if(home?.members==null){
             return
         }
 
+        // Obtenemos la lista de ids de los miembros del hogar
         val membersIds = home?.members ?: emptyList()
 
+        // Mensaje si no hay miembros
         if (membersIds.isEmpty()) {
             Log.d("Firebase", "No hay miembros en este hogar.")
             return
         }
 
+        // Lista mutable para almacenar los miembros del hogar
         val membersHome = mutableListOf<Member>()
 
+        // Itera sobre la lista de IDs de los miembros para obtener su información
         for (memberId in membersIds) {
             database.child("members").child(memberId).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    // Si el snapshot existe, convierte los datos a un objeto Member
                     if (snapshot.exists()) {
                         val member = snapshot.getValue(Member::class.java)
                         member?.let { membersHome.add(it) }
                     }
 
+                    // Si se han obtenido todos los miembros, crea y asigna el adaptador al ListView.
                     if (membersHome.size == membersIds.size) {
                         val listView = findViewById<ListView>(R.id.listViewMiembros)
                         val adapter = MiembroAdapter(this@Settings, membersHome, home!!, database, auth)
@@ -160,6 +186,11 @@ class Settings : AppCompatActivity() {
         }
     }
 
+    /**
+     * Guarda el nuevo nombre del hogar en la base de datos de Firebase.
+     * Realiza validaciones para asegurar que el nombre no esté vacío y que el usuario esté autenticado.
+     * @param texto El nuevo nombre del hogar a guardar.
+     */
     fun guardarNombre(texto: String) {
         //Verificar que no este vacio
         if (texto.isEmpty()) {
@@ -183,34 +214,47 @@ class Settings : AppCompatActivity() {
         database.child("homes").child(homeId).child("nombre").setValue(texto)
             .addOnSuccessListener {
                 Toast.makeText(this, "Nombre actualizado exitosamente", Toast.LENGTH_SHORT).show()
-                home!!.nombre = texto
+                home!!.nombre = texto //Actualizamos localmente tambien
             }
             .addOnFailureListener { e ->
                 showError("Error al actualizar el nombre: ${e.message}")
             }
     }
 
+    /**
+     * Guarda el estado de edición del hogar (habilitado o deshabilitado) en la base de datos de Firebase.
+     * Realiza validaciones para asegurar que el usuario esté autenticado y que el objeto Home no sea nulo.
+     * @param editable Booleano que indica si la edición de tareas está habilitada (true) o no (false).
+     */
     fun guardarEditable(editable: Boolean) {
+        // Obtenemos el ID del usuario autenticado
         val userId = auth.currentUser?.uid ?: run {
             showError("Error: Usuario no autenticado")
             return
         }
 
+        // Verificamo que el objeto Home y su ID no sean nulos
         val homeId = home?.id ?: run {
             showError("Error: No se encontró el ID del hogar")
             return
         }
 
+        // Actualizar el estado de edición del hogar en la base de datos
         database.child("homes").child(homeId).child("editable").setValue(editable)
             .addOnSuccessListener {
                 Toast.makeText(this, "Permiso de edición actualizado", Toast.LENGTH_SHORT).show()
-                home!!.editable = editable
+                home!!.editable = editable //Actualizamos localmente tambien
             }
             .addOnFailureListener { e ->
                 showError("Error al actualizar editable: ${e.message}")
             }
     }
 
+    /**
+     * Borra el hogar actual y todas sus tareas asociadas de la base de datos de Firebase.
+     * Solo el administrador del hogar debería poder realizar esta acción.
+     * Realiza validaciones para asegurar que el usuario esté autenticado y que el objeto Home no sea nulo.
+     */
     private fun borrarCasa(){
         //Usuario autentificado
         val userId = auth.currentUser?.uid ?: run {
@@ -228,6 +272,7 @@ class Settings : AppCompatActivity() {
         database.child("tasks").orderByChild("homeId").equalTo(homeId)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    // Itera sobre todas las tareas encontradas con el homeId actual y las elimina
                     for (taskSnapshot in snapshot.children) {
                         taskSnapshot.ref.removeValue()
                     }
@@ -236,6 +281,7 @@ class Settings : AppCompatActivity() {
                     database.child("homes").child(homeId).removeValue()
                         .addOnSuccessListener {
                             Toast.makeText(this@Settings, "Hogar y tareas eliminados", Toast.LENGTH_SHORT).show()
+                            // Redirige al usuario a la actividad de creación/unión de hogares
                             startActivity(Intent(this@Settings, CreateJoinHome::class.java))
                             finish()
                         }
@@ -244,17 +290,31 @@ class Settings : AppCompatActivity() {
                         }
                 }
 
+                // En caso de un error al borrar
                 override fun onCancelled(error: DatabaseError) {
                     showError("Error al borrar las tareas: ${error.message}")
                 }
             })
     }
 
+    /**
+     * Muestra un Toast con el mensaje de error proporcionado y loguea el error en la consola.
+     * @param message El mensaje de error a mostrar.
+     */
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         println("Error: $message")
     }
 
+    /**
+     * Adaptador personalizado para mostrar la lista de miembros del hogar en un ListView.
+     * Permite eliminar miembros del hogar (excepto al administrador).
+     * @param context El contexto de la actividad.
+     * @param data La lista mutable de objetos [Member] a mostrar.
+     * @param home El objeto [Home] actual.
+     * @param database Referencia a la base de datos de Firebase.
+     * @param auth Instancia del servicio de autenticación de Firebase.
+     */
     class MiembroAdapter(private val context: Context,
                          private var data: MutableList<Member>,
                          private val home: Home,
@@ -267,22 +327,36 @@ class Settings : AppCompatActivity() {
 
         override fun getItemId(position: Int): Long = position.toLong()
 
+        /**
+         * Proporciona una vista para cada elemento en el ListView de miembros.
+         * @param position La posición del miembro en la lista.
+         * @param convertView La vista antigua para reutilizar, si está disponible.
+         * @param parent El ViewGroup al que se adjuntará la vista.
+         * @return La vista que muestra el nombre del miembro y el botón de eliminar.
+         */
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.settings_member, parent, false)
 
+            // Obtiene las referencias a las vistas dentro del layout del elemento del miembro
             val tvNombre = view.findViewById<TextView>(R.id.tvNombre)
             val btnEliminar = view.findViewById<ImageView>(R.id.btnEliminar)
+            // Miembro actual
             val miembro = data[position]
 
+            // Muestra el nombre del miembro en el TextView
             tvNombre.text = miembro.name
 
+            // Oculta el botón de eliminar si el miembro actual es el administrador del hogar
             if(miembro.id==home.adminId){
                 btnEliminar.visibility = View.GONE
             }
 
+            // Listener para el botón de eliminar miembro.
             btnEliminar.setOnClickListener {
+                // Llama a la función para eliminar el miembro de forma atómica (incluyendo sus tareas asignadas)
                 eliminarMiembroCompletoAtomic(miembro.id, home.id) { exito ->
                     if (exito) {
+                        // Si la eliminación fue exitosa, remueve el miembro de la lista local y notifica al adaptador
                         data.removeAt(position)
                         notifyDataSetChanged()
                         Toast.makeText(context, "Miembro y tareas eliminadas", Toast.LENGTH_SHORT).show()
@@ -294,6 +368,13 @@ class Settings : AppCompatActivity() {
             return view
         }
 
+        /**
+         * Elimina un miembro del hogar de forma atómica, incluyendo la eliminación de las tareas
+         * que solo estaban asignadas a ese miembro y la actualización de las tareas compartidas.
+         * @param miembroId El ID del miembro a eliminar.
+         * @param homeId El ID del hogar al que pertenece el miembro.
+         * @param onResult Función lambda que recibe un booleano indicando si la operación fue exitosa.
+         */
         fun eliminarMiembroCompletoAtomic(
             miembroId: String,
             homeId: String,

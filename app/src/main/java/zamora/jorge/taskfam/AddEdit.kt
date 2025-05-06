@@ -44,20 +44,26 @@ class AddEdit : AppCompatActivity() {
 
         window.statusBarColor = Color.BLACK
 
+        // Obtenemos datos del intent
         val bundle = intent.extras
 
         binding = ActivityAddEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Verificamos si se recibieron extras
         if (bundle != null) {
+            // Recuperamos los extras
             accion = bundle.getString("Accion")
             home = bundle.get("Home") as Home?
             tarea = bundle.get("TASK") as Task?
 
+            // Obtiene lista de miembros actual y actualiza el adapter
             obtenerMiembrosDeHome { listaMiembros ->
                 miembrosDisponibles = listaMiembros.toMutableList()
                 actualizarAdapter()
             }
+
+            // Mostramos los textos adecuados a la accion a realizar
             binding.tvAgregarEditar.text = accion
             binding.btnAgregarEditar.text = accion
 
@@ -65,23 +71,29 @@ class AddEdit : AppCompatActivity() {
                 binding.etNombreTarea.setText(tarea?.titulo)
                 binding.etDescripcion.setText(tarea?.descripcion)
 
+                // Obtiene las asignaciones de la tarea (miembros y días asignados)
                 val assignments = tarea?.assignments ?: emptyMap()
 
+                // Obtiene la información de los miembros asignados a la tarea
                 obtenerMiembrosPorIds(assignments.keys.toList()) { miembros ->
                     val miembrosDeTarea = mutableListOf<MembersDay>()
 
                     for (miembro in miembros) {
+                        // Recuperamos los dias seleccionados por miembro y creamos un mapa en el cual se marcaran como seleccionados
                         val diasAsignados = assignments[miembro.id] ?: emptyMap()
                         val diasSeleccionados =
                             diasAsignados.keys.associateWith { true }.toMutableMap()
                         miembrosDeTarea.add(MembersDay(miembro, diasSeleccionados))
                     }
 
+                    // Limpia la lista de miembros asignados y agrega los miembros de la tarea
                     miembrosAsignados.clear()
                     miembrosAsignados.addAll(miembrosDeTarea)
 
+                    // Remueve los miembros de la tarea de la lista de miembros disponibles
                     miembrosDisponibles.removeAll(miembros.map { it })
 
+                    // Mostramos miembros y dias seleccionados en el adapter
                     actualizarAdapter()
                 }
 
@@ -90,56 +102,88 @@ class AddEdit : AppCompatActivity() {
         }
 
         binding.btnAgregarHabitante.setOnClickListener {
+            // Usamos el metodo para agregar habitante a la tarea
             agregarHabitante()
         }
 
         binding.btnAgregarEditar.setOnClickListener {
+            // Verificamos si la accion recuperada en extras es para agregar tarea
             if (accion.equals("AGREGAR")) {
+                // Usamos el metodo para agregar tarea
                 agregarTarea()
             } else if (accion.equals("EDITAR")) {
+                // Usamos el metodo para actualizar tarea
                 actualizarTarea()
             }
         }
 
         binding.tvEliminar.setOnClickListener {
+            // Usamos el metodo para eliminar tarea
             eliminarTarea()
         }
 
         binding.ivBackArrow.setOnClickListener {
+            // Creamos un intent a MainActivity y enviamos el hogar actual
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("HOME", home)
             startActivity(intent)
         }
     }
 
+    /**
+     * Elimina la tarea actual de la base de datos de Firebase.
+     * Después de eliminar la tarea, regresa a la actividad principal.
+     */
     private fun eliminarTarea(){
+        // Obtenemos una referencia de la bd eb firebase
         val database = FirebaseDatabase.getInstance().reference
+        // Elimina la tarea de la bd usando el id de la misma
         database.child("tasks").child(tarea?.id ?: "").removeValue()
 
+        // Creamos un intent a MainActivity y enviamos el hogar actual
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("HOME", home)
         startActivity(intent)
+        // Cerramos la actividad actual
         finish()
     }
 
 
+    /**
+     * Obtiene la lista de miembros pertenecientes al hogar actual desde la base de datos de Firebase.
+     * @param callback Función lambda que se llamará con la lista de [Member] del hogar.
+     */
     private fun obtenerMiembrosDeHome(callback: (List<Member>) -> Unit) {
+        // Obtenemos una referencia de la bd eb firebase
         val database = FirebaseDatabase.getInstance().reference
+        // Obtenemos una referencia de la casa acutal
         val homeId = home?.id
 
+        // Si el ID es null o vacio, arrojamos un error
         if (homeId.isNullOrEmpty()) {
             Log.e("Firebase", "Error: homeId es nulo o vacío")
             callback(emptyList())
             return
         }
 
+        // Accedemos a los miembros de la casa en especifico
         database.child("homes").child(homeId).child("members")
             .addListenerForSingleValueEvent(object : ValueEventListener {
+                /**
+                 * Se llama cuando se obtienen los datos de los miembros del hogar.
+                 * @param snapshot Contiene los IDs de los usuarios que son miembros del hogar.
+                 */
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    // Mapea los ID de los usuarios de la casa a Strings
                     val userIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                    // Obtenemos los miembros por sus ids.
                     obtenerMiembrosPorIds(userIds, callback)
                 }
 
+                /**
+                 * Se llama si la operación de lectura de datos es cancelada.
+                 * @param error Contiene información sobre el error ocurrido.
+                 */
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("Firebase", "Error al obtener IDs de miembros: ${error.message}")
                     callback(emptyList())
@@ -147,36 +191,60 @@ class AddEdit : AppCompatActivity() {
             })
     }
 
+    /**
+     * Obtiene la información detallada de una lista de miembros utilizando sus IDs desde la base de datos de Firebase.
+     * @param userIds Lista de IDs de los miembros a obtener.
+     * @param callback Función lambda que se llamará con la lista de objetos [Member] obtenidos.
+     */
     private fun obtenerMiembrosPorIds(userIds: List<String>, callback: (List<Member>) -> Unit) {
+        // Obtenemos una referencia de la bd eb firebase
         val database = FirebaseDatabase.getInstance().reference
+        // Lista mutable de miemrbos obtenidos
         val miembros = mutableListOf<Member>()
+        // Contador para verificar que se hayan obtenido todos los miembros
         var pendientes = userIds.size
 
+        // Si esta vacia enviamos una lista vacia
         if (userIds.isEmpty()) {
             callback(emptyList())
             return
         }
 
+        // Iteramos por las ids de los usuarios
         for (userId in userIds) {
+            // Accedemos a miembros
             database.child("members").child(userId)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
+                    /**
+                     * Se llama cuando se obtienen los datos de un miembro.
+                     * @param userSnapshot Contiene la información del miembro.
+                     */
                     override fun onDataChange(userSnapshot: DataSnapshot) {
+                        // Obtenemos el nombre e email del miembro
                         val name = userSnapshot.child("name").getValue(String::class.java)
                         val email = userSnapshot.child("email").getValue(String::class.java)
 
+                        // Construimos un objeto con la informacion
                         val miembro = Member(
                             id = userId,
                             name = name ?: "Sin nombre",
                             email = email ?: "Sin correo"
                         )
+                        // Lo agregamos a la lista
                         miembros.add(miembro)
+                        // Restamos los pendientes
                         pendientes--
 
                         if (pendientes == 0) {
+                            // Cuando se recorra toda la lista se devuelve la lista de miembros con el callback
                             callback(miembros)
                         }
                     }
 
+                    /**
+                     * Se llama si la operación de lectura de datos es cancelada para un miembro específico.
+                     * @param error Contiene información sobre el error ocurrido.
+                     */
                     override fun onCancelled(error: DatabaseError) {
                         Log.e("Firebase", "Error al obtener miembro $userId: ${error.message}")
                         pendientes--
@@ -189,43 +257,74 @@ class AddEdit : AppCompatActivity() {
     }
 
 
+    /**
+     * Agrega el primer miembro disponible a la lista de miembros asignados a la tarea.
+     * Si no hay miembros disponibles, muestra un Toast indicando la situación.
+     * Después de agregar un miembro, actualiza el adaptador de la lista.
+     */
     private fun agregarHabitante() {
+        // Verificamos si hay miembros disponibles
         if (miembrosDisponibles.isNotEmpty()) {
+            // Obtiene el primer miembro de la lista de disponibles
             val primerDisponible = miembrosDisponibles.first()
+            // Remueve el miembro de la lista de disponibles.
             miembrosDisponibles.remove(primerDisponible)
+            // Agrega el miembro a la lista de asignados
             miembrosAsignados.add(MembersDay(primerDisponible))
+            // Actualiza el adaptador para reflejar el cambio
             actualizarAdapter()
         } else {
+            // Muestra mensaje de error si no hay miembros a agregar
             Toast.makeText(this, "No hay más miembros disponibles", Toast.LENGTH_SHORT).show()
         }
     }
 
+    /**
+     * Crea o actualiza el adaptador para la lista de miembros asignados.
+     * El adaptador se encarga de mostrar cada miembro y permitir la selección de los días asignados.
+     */
     private fun actualizarAdapter() {
+        // Crea una nueva instancia del adaptador con la lista actual de miembros asignados y disponibles,
+        // y una lambda que se llama cuando la lista de miembros asignados cambia
         adapter =
             MiembroAdapter(this, miembrosAsignados, miembrosDisponibles) { actualizarAdapter() }
+        // Asigna el adapter al ListView de miembros
         binding.lvMiembros.adapter = adapter
     }
 
+    /**
+     * Agrega una nueva tarea a la base de datos de Firebase.
+     * Recopila el nombre, la descripción y los miembros asignados con sus respectivos días.
+     * Valida que se hayan ingresado todos los datos y que al menos un miembro esté asignado con algún día.
+     * Después de agregar la tarea, regresa a la actividad principal.
+     */
     private fun agregarTarea() {
+        // Obtenemos el nombre y descripcion de los EditText
         val nombre = binding.etNombreTarea.text.toString()
         val descripcion = binding.etDescripcion.text.toString()
 
+        // Verificamos que no esten vacios
         if (nombre.isEmpty() || descripcion.isEmpty()) {
             Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Verificamos que haya miembros en la tarea
         if (miembrosAsignados.isEmpty()) {
             Toast.makeText(this, "Por favor agregue al menos un miembro", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Creamos una lista mutable de tareas
         val asignaciones = mutableMapOf<String, Map<String, Boolean>>()
+        // Genera una ID para la tarea en Firebase
         val taskId = FirebaseDatabase.getInstance().reference.child("tasks").push().key ?: return
+        // Obtiene el ID del hogar actual
         val homeId = home?.id ?: ""
 
         var diasTareas = false
 
+        // Itera sobre cada miembro asignado para recopilar los días seleccionados
         for (miembro in miembrosAsignados) {
             val diasSeleccionados = mutableMapOf<String, Boolean>()
 
@@ -252,8 +351,11 @@ class AddEdit : AppCompatActivity() {
                 diasSeleccionados["Domingo"] = false
             }
 
+            // Verifica si el miembro tiene al menos un día seleccionado
             if (diasSeleccionados.isNotEmpty()) {
                 diasTareas = true
+                // Agrega las asignaciones del miembro al mapa principal de asignaciones
+
                 asignaciones[miembro.member.id] = diasSeleccionados
             } else{
                 diasTareas = false
@@ -269,10 +371,12 @@ class AddEdit : AppCompatActivity() {
             miembroRef.child("tasks").push().setValue(taskId)
         }
 
+        // Si ningún miembro tiene días asignados, detiene la creación de la tarea
         if (!diasTareas){
             return
         }
 
+        // Crea un objeto Task con la información recopilada
         val tarea = Task(
             id = taskId,
             titulo = nombre,
@@ -300,24 +404,35 @@ class AddEdit : AppCompatActivity() {
             }
     }
 
+    /**
+     * Actualiza la información de una tarea existente en la base de datos de Firebase.
+     * Recopila el nuevo nombre, la descripción y las asignaciones actualizadas de los miembros.
+     * Valida que se hayan ingresado todos los datos y que al menos un miembro esté asignado con algún día.
+     * Después de actualizar la tarea, regresa a la actividad principal.
+     */
     private fun actualizarTarea() {
+        // Obtenemos el nombre y descripcion de los EditText
         val nombre = binding.etNombreTarea.text.toString()
         val descripcion = binding.etDescripcion.text.toString()
 
+        // Verificamos que no esten vacios
         if (nombre.isEmpty() || descripcion.isEmpty()) {
             Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Valida que al menos un miembro esté asignado a la tarea
         if (miembrosAsignados.isEmpty()) {
             Toast.makeText(this, "Por favor agregue al menos un miembro", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Creamos una lista mutable de tareas
         val asignaciones = mutableMapOf<String, Map<String, Boolean>>()
 
         var diasTareas = false
 
+        // Itera sobre cada miembro asignado para recopilar los días seleccionados
         for (miembro in miembrosAsignados) {
             val diasSeleccionados = mutableMapOf<String, Boolean>()
 
@@ -355,10 +470,12 @@ class AddEdit : AppCompatActivity() {
 
         }
 
+        // Si ningún miembro tiene días asignados, detiene la actualización de la tarea.
         if (!diasTareas){
             return
         }
 
+        // Crea un objeto Task con la información recopilada
         val tareaActualizada = Task(
             id = tarea?.id ?: return,
             titulo = nombre,
@@ -367,11 +484,14 @@ class AddEdit : AppCompatActivity() {
             assignments = asignaciones
         )
 
+        // Creamos una referencia de la bd
         val database = FirebaseDatabase.getInstance().reference
+        // Actualizamos la tarea en base al id, poniendo de valor el objeto antes creado
         database.child("tasks").child(tarea?.id ?: "").setValue(tareaActualizada)
             .addOnSuccessListener {
                 Toast.makeText(this, "Tarea actualizada exitosamente", Toast.LENGTH_SHORT).show()
 
+                // Actualiza la lista de tareas del hogar en Firebase (reemplazando la tarea antigua con la nueva).
                 val homeRef =
                     FirebaseDatabase.getInstance().reference.child("homes").child(home?.id ?: "")
                 homeRef.child("tasks").push().setValue(tarea?.id)
@@ -387,6 +507,18 @@ class AddEdit : AppCompatActivity() {
 
 }
 
+/**
+ * Adaptador personalizado para mostrar la lista de miembros asignados a una tarea
+ * y permitir la selección de los días de la semana para cada miembro.
+ * @param context El contexto de la actividad.
+ * @param miembrosAsignados La lista mutable de objetos [MembersDay] que representan
+ * los miembros asignados a la tarea junto con sus días seleccionados.
+ * @param miembrosDisponibles La lista mutable de objetos [Member] que aún no han sido
+ * asignados a la tarea y están disponibles para ser agregados.
+ * @param onListUpdate Una función lambda que se llama cuando la lista de miembros asignados
+ * es modificada (se agrega o elimina un miembro). Se utiliza para notificar a la actividad
+ * que debe actualizar su UI.
+ */
 class MiembroAdapter(
     private val context: Context,
     private val miembrosAsignados: MutableList<MembersDay>,
@@ -394,11 +526,19 @@ class MiembroAdapter(
     private val onListUpdate: () -> Unit
 ) : ArrayAdapter<MembersDay>(context, 0, miembrosAsignados) {
 
+    /**
+     * Proporciona una vista para cada elemento en el [android.widget.ListView] de miembros asignados.
+     * @param position La posición del elemento dentro del adaptador.
+     * @param convertView La vista antigua para reutilizar, si está disponible.
+     * @param parent El ViewGroup al que se adjuntará la vista.
+     * @return La vista que muestra la información del miembro y los controles para los días.
+     */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view =
             convertView ?: LayoutInflater.from(context).inflate(R.layout.item_member, parent, false)
         val miembroActual = miembrosAsignados[position]
 
+        // Establecemos instancia de la vista
         val spinner = view.findViewById<Spinner>(R.id.sSeleccionMiembro)
         val btnEliminar = view.findViewById<TextView>(R.id.tvEliminar)
 
@@ -451,7 +591,7 @@ class MiembroAdapter(
         val spinnerAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, opciones)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = spinnerAdapter
-        spinner.setSelection(0)
+        spinner.setSelection(0) // Selecciona el miembro actual por defecto.
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -478,6 +618,7 @@ class MiembroAdapter(
             onListUpdate()
         }
 
+        // Actualiza el estado de los checkboxes de los días según el mapa de días seleccionados.
         actualizarChecks(
             mapaDias,
             chbLunes,
@@ -494,6 +635,21 @@ class MiembroAdapter(
         return view
     }
 
+    /**
+     * Actualiza el estado de los checkboxes de los días y el checkbox "Todos los días"
+     * según el mapa de días seleccionados para un miembro.
+     * @param mapaDias El mapa que contiene los días seleccionados para el miembro actual.
+     * @param chbLunes Checkbox para el día Lunes.
+     * @param chbMartes Checkbox para el día Martes.
+     * @param chbMiercoles Checkbox para el día Miércoles.
+     * @param chbJueves Checkbox para el día Jueves.
+     * @param chbViernes Checkbox para el día Viernes.
+     * @param chbSabado Checkbox para el día Sábado.
+     * @param chbDomingo Checkbox para el día Domingo.
+     * @param cbTodosDias Checkbox para seleccionar/deseleccionar todos los días.
+     * @param todosDiasListener El listener para el checkbox "Todos los días".
+     * @param listenerDia Una función que genera un listener para cada checkbox de día individual.
+     */
     private fun actualizarChecks(
         mapaDias: MutableMap<String, Boolean>,
         chbLunes: CheckBox,
@@ -523,16 +679,19 @@ class MiembroAdapter(
             checkbox.isChecked = mapaDias.containsKey(dia)
         }
 
+        // Limpia el listener del checkbox "Todos los días" y establece su estado inicial
+        // según si todos los días de la semana están presentes en el mapa
         cbTodosDias.setOnCheckedChangeListener(null)
         cbTodosDias.isChecked = mapaDias.keys.containsAll(
             dias.map { it.first }
         )
 
-        // Vuelve a setear listeners
+        // Vuelve a asignar los listeners a los checkboxes de los días individuales
         dias.forEach { (dia, checkbox) ->
             checkbox.setOnCheckedChangeListener(listenerDia(dia))
         }
 
+        // Vuelve a asignar el listener al checkbox en todos los dias
         cbTodosDias.setOnCheckedChangeListener(todosDiasListener)
     }
 

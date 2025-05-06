@@ -43,16 +43,20 @@ class Register : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Listener que nos redirige Login, si ya tenemos cuenta
         binding.tvYaTienesCuenta.setOnClickListener {
             yaTienesCuenta()
         }
 
+        // Listener que maneja la logica de registro
         binding.btnRegistrarse.setOnClickListener {
             registrarse()
         }
 
 
+        // Instancia de autenticacion de Firebase
         auth = Firebase.auth
+        // Instancia de elementos visuales
         val nombre: EditText =findViewById(R.id.etNombre)
         val email: EditText =findViewById(R.id.etCorreo)
         val password: EditText =findViewById(R.id.etContrasena)
@@ -62,6 +66,7 @@ class Register : AppCompatActivity() {
 
         error.visibility= View.INVISIBLE
 
+        // Manejamos el boton de registro, si hay un erro lo notifica en el TextView Error
         button.setOnClickListener{
             if(email.text.isEmpty()||password.text.isEmpty()||confirmPassword.text.isEmpty()){
                 error.text="Por favor ingrese todos los campos"
@@ -70,17 +75,24 @@ class Register : AppCompatActivity() {
                 error.text="Las contraseñas no coinciden"
                 error.visibility= View.VISIBLE
             }else{
+                // Si no hay error, se maneja el registro
                 sigIn(email.text.toString(),password.text.toString(), nombre.text.toString(), error)
             }
         }
 
     }
 
+    // Nos lleva a Login
     fun yaTienesCuenta() {
         val intent = Intent(this, Login::class.java)
         startActivity(intent)
     }
 
+    /**
+     * Intenta registrar un nuevo usuario con el correo electrónico y la contraseña proporcionados.
+     * Realiza validaciones básicas en los campos antes de intentar el registro.
+     * Después del registro exitoso, navega a la actividad CreateJoinHome.
+     */
     fun registrarse() {
         //Obtener datos
         val nombre=binding.etNombre
@@ -122,6 +134,10 @@ class Register : AppCompatActivity() {
         startActivity(intent)
     }
 
+    /**
+     * Genera un color aleatorio en formato ARGB.
+     * @return Un entero representando el color aleatorio.
+     */
     private fun generarColorAleatorio(): Int {
         val r = Random.nextInt(0, 256)
         val g = Random.nextInt(0, 256)
@@ -129,17 +145,32 @@ class Register : AppCompatActivity() {
         return Color.argb(255, r, g, b)
     }
 
+    /**
+     * Crea un nuevo usuario con el correo electrónico y la contraseña proporcionados en Firebase Authentication.
+     * Si el registro es exitoso, guarda la información del nuevo miembro (ID de usuario, nombre, correo electrónico y color aleatorio)
+     * en la base de datos de Firebase Realtime bajo el nodo "members".
+     * Si falla el registro o el guardado de datos, muestra un mensaje de error.
+     *
+     * @param email El correo electrónico del nuevo usuario.
+     * @param password La contraseña del nuevo usuario.
+     * @param name El nombre del nuevo usuario.
+     * @param error El TextView para mostrar mensajes de error al usuario.
+     */
     private fun sigIn(email: String, password: String, name: String, error: TextView) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
+                // Registro exitoso, obtener el usuario actual
                 val user = auth.currentUser
                 user?.let {
                     val uid = user.uid
+                    // Creamos un objeto Member con la información del nuevo usuario
                     val member = Member(id = uid, name = name, email = email, color = generarColorAleatorio())
 
                     val database = FirebaseDatabase.getInstance().reference
+                    // Guardar la información del miembro en miembros en la bd con el UID como clave
                     database.child("members").child(uid).setValue(member)
                         .addOnSuccessListener {
+                            // Si el guardado de datos es exitoso, navegar a la actividad CreateJoinHome
                             val intent = Intent(this, CreateJoinHome::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)

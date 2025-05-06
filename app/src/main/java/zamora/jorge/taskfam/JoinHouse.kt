@@ -27,15 +27,22 @@ class JoinHouse : AppCompatActivity() {
         binding = ActivityJoinHouseBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Listener para el boton de regreso
         binding.btnBack.setOnClickListener() {
             startActivity(Intent(this, CreateJoinHome::class.java))
         }
 
+        // Listener para la logica de ingresar a una casa
         binding.btnAdd.setOnClickListener() {
             joinHouse()
         }
     }
 
+    /**
+     * Intenta unir al usuario actual a un hogar existente utilizando el código ingresado.
+     * Valida que el código no esté vacío, busca el hogar en la base de datos,
+     * y si lo encuentra, agrega al usuario como miembro.
+     */
     fun joinHouse() {
         // Obtener datos
         val codigo = binding.inputCode.text.toString().trim()
@@ -46,17 +53,29 @@ class JoinHouse : AppCompatActivity() {
             return
         }
 
+        // Obtener una referencia al nodo "homes" en la base de datos de Firebase
         val database = FirebaseDatabase.getInstance().reference.child("homes")
 
+        // Buscar un hogar que tenga el código ingresado
         database.orderByChild("code").equalTo(codigo)
             .addListenerForSingleValueEvent(object : ValueEventListener {
+
+                /**
+                 * Se llama una vez con el valor en la ubicación inicial y nuevamente cada vez que los datos en esa ubicación cambian.
+                 * Este método se utiliza para procesar los resultados de la búsqueda del hogar por código.
+                 * @param snapshot Contiene los datos de los hogares que coinciden con el código.
+                 */
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    // Se verefica si existe la snapshot
                     if (snapshot.exists()) {
                         for (homeSnapshot in snapshot.children) {
+                            // Obtenemos el id del hogar y el usuario
                             val homeId = homeSnapshot.key
                             val userId = FirebaseAuth.getInstance().currentUser?.uid
 
+                            // Verificamos que no sean nullos
                             if (homeId != null && userId != null) {
+                                // Obtenemos la referencia de miembros del hogar encontrado
                                 val membersRef = database.child(homeId).child("members")
 
                                 //Obtiene la lista de miembros que tiene la casa ctualmente
@@ -77,9 +96,12 @@ class JoinHouse : AppCompatActivity() {
                                             //Modifica la lista de miembros con el nuevo usuario
                                             membersRef.setValue(membersList).addOnCompleteListener { task ->
 
+                                                // Verificamos si la operacion fue exitosa
                                                 if (task.isSuccessful) {
+                                                    // Ontenemos el estado del editable del hogar
                                                     val editable = homeSnapshot.child("editable").getValue(Boolean::class.java) ?: false
 
+                                                    // Si lo es, agregamos al usuario a admins
                                                     if (editable) {
                                                         val adminsRef = database.child(homeId).child("adminsId")
                                                         adminsRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -151,6 +173,10 @@ class JoinHouse : AppCompatActivity() {
                     }
                 }
 
+                /**
+                 * Se llama si la operación de lectura de datos es cancelada.
+                 * @param error Contiene información sobre el error ocurrido.
+                 */
                 override fun onCancelled(error: DatabaseError) {
                     Toast.makeText(
                         this@JoinHouse,
@@ -162,18 +188,29 @@ class JoinHouse : AppCompatActivity() {
 
     }
 
+    /**
+     * Carga la información completa del hogar desde la base de datos utilizando su ID
+     * y navega a la actividad MainActivity, pasando la información del hogar como un extra.
+     * @param homeId El ID único del hogar a cargar.
+     */
     fun cargarHogar(homeId: String){
+        // Creamos una referencia de la bd
         val database = FirebaseDatabase.getInstance().reference
 
+        // Si se selecciona un hogar cargamos toda su informacion a MainActivity
         database.child("homes").child(homeId).get().addOnSuccessListener { snapshot ->
+            // Verificamos que exista
             if (snapshot.exists()) {
+                // Obtenemos el hogar de la snapshot
                 val home = snapshot.getValue(Home::class.java)
                 if (home != null) {
+                    // Notificamos al usuario
                     Toast.makeText(
                         this@JoinHouse,
                         "Te has unido al hogar correctamente",
                         Toast.LENGTH_SHORT
                     ).show()
+                    // Iniciamos la actividad siguiente
                     val intent = Intent(this@JoinHouse, MainActivity::class.java)
                     intent.putExtra("HOME", home)
                     startActivity(intent)
