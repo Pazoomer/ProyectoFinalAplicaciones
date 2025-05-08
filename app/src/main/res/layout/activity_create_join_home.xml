@@ -29,7 +29,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_marginTop="20dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <!-- Botón Crear Hogar -->
         <LinearLayout
@@ -101,7 +101,7 @@
             android:layout_marginRight="40dp"
             android:padding="8dp"
             android:stretchMode="columnWidth"
-            android:visibility="visible"
+            android:visibility="gone"
             android:choiceMode="singleChoice"/>
     </LinearLayout>
 
@@ -124,6 +124,7 @@
             android:background="@drawable/rounded_button"
             android:gravity="center"
             android:orientation="vertical"
+            android:visibility="gone"
             android:padding="12dp">
 
             <ImageView
@@ -151,6 +152,7 @@
             android:layout_marginStart="16dp"
             android:gravity="center"
             android:background="@drawable/rounded_button"
+            android:visibility="gone"
             android:orientation="vertical"
             android:padding="12dp">
 

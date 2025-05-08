@@ -445,7 +445,7 @@ class MainActivity : AppCompatActivity() {
                     .setTitle("¿Completar tarea?")
                     .setMessage("¿Deseas marcar esta tarea como completada?")
                     .setPositiveButton("Sí") { _, _ ->
-                        completarTarea(tarea.id, miembroId, dia)
+                        completarTarea(tarea.id, miembroId, dia, context)
                     }
                     .setNegativeButton("Cancelar", null)
                     .show()
@@ -502,24 +502,78 @@ class MainActivity : AppCompatActivity() {
          * @param taskId id de la tarea a completar
          * @param miembroId id del mimebro que completo la tarea
          * @param dia dia especifico en que se completo la tarea
+         * @param context contexto
          */
-        private fun completarTarea(taskId: String, miembroId: String, dia: String) {
-            // Refrencia de la bd en firebase
-            val db = FirebaseDatabase.getInstance().reference
-            db.child("tasks")
-                .child(taskId)
-                .child("assignments")
-                .child(miembroId)
-                .child(dia)
-                // Establece el valor a true apra marcar como completada
-                .setValue(true)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Tarea completada", Toast.LENGTH_SHORT).show()
-                }
-                // Agrega un listener para manejar el fallo de la operación
-                .addOnFailureListener {
-                    Toast.makeText(context, "Error al completar tarea", Toast.LENGTH_SHORT).show()
-                }
+        private fun completarTarea(taskId: String, miembroId: String, dia: String, context: Context) {
+            // Mapeo de nombres de día a números (Lunes=1, ..., Domingo=7)
+            val diasSemanaMap = mapOf(
+                "lunes" to 1,
+                "martes" to 2,
+                "miércoles" to 3,
+                "jueves" to 4,
+                "viernes" to 5,
+                "sábado" to 6,
+                "domingo" to 7
+            )
+
+            // Obtiene el valor numérico del día de la tarea. Usamos lowercase() - CORREGIDO
+            val diaTareaNum = diasSemanaMap[dia.lowercase()] // <-- Línea Corregida aquí
+
+            // Verifica si el día de la tarea es válido según nuestro mapeo
+            if (diaTareaNum == null) {
+                Toast.makeText(context, "Día de tarea inválido: $dia", Toast.LENGTH_SHORT).show()
+                return // Sale de la función si el día no es válido
+            }
+
+            // Obtiene el día actual de la semana usando Calendar
+            val calendar = Calendar.getInstance()
+            // Calendar.DAY_OF_WEEK da 1=Domingo, 2=Lunes, ..., 7=Sábado.
+            // Necesitamos convertir esto a nuestro mapeo (1=Lunes, ..., 7=Domingo).
+            val diaActualCalendar = calendar.get(Calendar.DAY_OF_WEEK)
+
+            // Mapea el día de Calendar al número según nuestra lógica (1=Lunes, ..., 7=Domingo)
+            val diaActualNum = when (diaActualCalendar) {
+                Calendar.MONDAY -> 1
+                Calendar.TUESDAY -> 2
+                Calendar.WEDNESDAY -> 3
+                Calendar.THURSDAY -> 4
+                Calendar.FRIDAY -> 5
+                Calendar.SATURDAY -> 6
+                Calendar.SUNDAY -> 7
+                else -> -1 // Caso de error inesperado
+            }
+
+            // Verifica que pudimos obtener el día actual correctamente
+            if (diaActualNum == -1) {
+                Toast.makeText(context, "Error al obtener el día actual.", Toast.LENGTH_SHORT).show()
+                return // Sale de la función
+            }
+
+
+            // Compara el día de la tarea con el día actual
+            if (diaTareaNum <= diaActualNum) {
+                // Si el día de la tarea es hoy o un día anterior, procede a marcar como completada
+
+                // Refrencia de la bd en firebase
+                val db = FirebaseDatabase.getInstance().reference
+                db.child("tasks")
+                    .child(taskId)
+                    .child("assignments")
+                    .child(miembroId)
+                    .child(dia) // Usamos el nombre original del día para la ruta de Firebase
+                    // Establece el valor a true apra marcar como completada
+                    .setValue(true)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Tarea completada", Toast.LENGTH_SHORT).show()
+                    }
+                    // Agrega un listener para manejar el fallo de la operación
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Error al completar tarea", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                // Si el día de la tarea es un día futuro, no permite completar
+                Toast.makeText(context, "Solo puedes completar tareas del día actual o días anteriores.", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

@@ -34,9 +34,12 @@ class CreateJoinHome : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
 
+    // CAMBIO AÑADIDO: Declarar variable para guardar la referencia del listener
+    private var homesChildEventListener: ChildEventListener? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = getColor(android.R.color.black)
+
         binding = ActivityCreateJoinHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -71,15 +74,22 @@ class CreateJoinHome : AppCompatActivity() {
 
         // Listener para el botón de cerrar sesión.
         binding.btnCerrarSesion.setOnClickListener{
+            // Remueve el listener ANTES de cerrar sesión y finalizar la actividad
+            // Esto asegura que no intente operar después de que el usuario se desautentique
+            homesChildEventListener?.let {
+                database.removeEventListener(it)
+                homesChildEventListener = null // Opcional: limpia la referencia
+            }
+
             // Cierra la sesión del usuario en firebase auth
             Firebase.auth.signOut()
-            //V Vuelve a la actividad Login
+            // Vuelve a la actividad Login
             startActivity(Intent(this,Login::class.java))
             // Finaliza la actividad para que no se pueda regresar
             finish()
         }
-            // Empieza el proceso para obtener los lugares a los que el usuario pertenece
-            obtenerCasasDeUsuario()
+        // Empieza el proceso para obtener los lugares a los que el usuario pertenece
+        obtenerCasasDeUsuario()
     }
 
     /**
@@ -90,8 +100,8 @@ class CreateJoinHome : AppCompatActivity() {
         //Obtiene el ID del usurio que esta logueado, si no lo hay sale de la funcíón
         val userId = auth.currentUser?.uid ?: return
 
-        // Este listener reacciona a eventos en el nodo de homes
-        database.addChildEventListener(object : ChildEventListener {
+        // Asigna el listener a la variable de clase al adjuntarlo
+        homesChildEventListener = database.addChildEventListener(object : ChildEventListener {
 
             /**
              * Para cada hogar que tiene el usuario cuando el listener se llama por primera vez
@@ -149,15 +159,18 @@ class CreateJoinHome : AppCompatActivity() {
                 actualizarVista()
             }
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                // Tu implementación original aquí
+            }
 
             /**
              * Se llama si la operación es cancelada
              */
             override fun onCancelled(error: DatabaseError) {
+                // Tu implementación original aquí
                 Toast.makeText(this@CreateJoinHome, "Error al obtener hogares: ${error.message}", Toast.LENGTH_SHORT).show()
             }
-        })
+        }) // Fin del listener
     }
 
     /**
@@ -187,6 +200,16 @@ class CreateJoinHome : AppCompatActivity() {
             binding.botonesGrandes.visibility = View.GONE
         }
     }
+
+    // Implementa onDestroy para remover el listener
+    override fun onDestroy() {
+        super.onDestroy()
+        // Remueve el listener cuando la actividad se destruye
+        homesChildEventListener?.let {
+            database.removeEventListener(it)
+        }
+    }
+
 
     /**
      * Adapador para mostrar una lista de objetos Home en una listView
