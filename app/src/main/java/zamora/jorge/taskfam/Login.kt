@@ -101,7 +101,7 @@ class Login : AppCompatActivity() {
 
         // Validar campos vacíos
         if ( correo.text.isEmpty() || contrasena.text.isEmpty()) {
-            Toast.makeText(this, "Por favor ingrese todos sus datos", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Ingrese todos sus datos", Toast.LENGTH_SHORT).show()
             return
         }
 

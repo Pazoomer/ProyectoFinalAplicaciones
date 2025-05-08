@@ -34,6 +34,8 @@ class CreateJoinHome : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
 
+    private var cerrandoSesion = false //Bandera para indicar cierre de sesion
+
     // CAMBIO AÑADIDO: Declarar variable para guardar la referencia del listener
     private var homesChildEventListener: ChildEventListener? = null
 
@@ -74,15 +76,19 @@ class CreateJoinHome : AppCompatActivity() {
 
         // Listener para el botón de cerrar sesión.
         binding.btnCerrarSesion.setOnClickListener{
+            //Se activa la bandera de que se esta cerrando sesion
+            cerrandoSesion = true
             // Remueve el listener ANTES de cerrar sesión y finalizar la actividad
             // Esto asegura que no intente operar después de que el usuario se desautentique
             homesChildEventListener?.let {
                 database.removeEventListener(it)
-                homesChildEventListener = null // Opcional: limpia la referencia
+                homesChildEventListener = null // Limpia la referencia
             }
 
             // Cierra la sesión del usuario en firebase auth
             Firebase.auth.signOut()
+            //Mostrar mensaje de confirmación
+            Toast.makeText(this@CreateJoinHome, "Sesion cerrada con exito", Toast.LENGTH_SHORT).show()
             // Vuelve a la actividad Login
             startActivity(Intent(this,Login::class.java))
             // Finaliza la actividad para que no se pueda regresar
@@ -160,15 +166,13 @@ class CreateJoinHome : AppCompatActivity() {
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                // Tu implementación original aquí
             }
 
             /**
              * Se llama si la operación es cancelada
              */
             override fun onCancelled(error: DatabaseError) {
-                // Tu implementación original aquí
-                Toast.makeText(this@CreateJoinHome, "Error al obtener hogares: ${error.message}", Toast.LENGTH_SHORT).show()
+
             }
         }) // Fin del listener
     }

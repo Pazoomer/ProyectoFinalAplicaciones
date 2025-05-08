@@ -572,7 +572,7 @@ class MainActivity : AppCompatActivity() {
                     }
             } else {
                 // Si el día de la tarea es un día futuro, no permite completar
-                Toast.makeText(context, "Solo puedes completar tareas del día actual o días anteriores.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "No puedes completar tareas futuras.", Toast.LENGTH_LONG).show()
             }
         }
     }

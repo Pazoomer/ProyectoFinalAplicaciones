@@ -102,14 +102,14 @@ class Register : AppCompatActivity() {
 
         // Validar campos vacíos
         if (nombre.text.isEmpty() || correo.text.isEmpty() || contrasena.text.isEmpty() || confirmarContrasena.text.isEmpty()) {
-            Toast.makeText(this, "Por favor ingrese todos sus datos", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Ingrese todos sus datos", Toast.LENGTH_SHORT).show()
             return
         }
 
         // Validar nombre (máximo 12 caracteres,solo letras y numeros)
         val nombreRegex = Regex("^[a-zA-Z0-9\\s]{1,12}\$")
         if (!nombre.text.matches(nombreRegex) || nombre.text.isBlank()) {
-            Toast.makeText(this, "Nombre inválido: máximo 12 caracteres, solo letras y numeros", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Máximo 12 caracteres, solo letras y numeros", Toast.LENGTH_SHORT).show()
             return
         }
 
