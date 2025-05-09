@@ -470,7 +470,7 @@ class AddEdit : AppCompatActivity() {
             return
         }
 
-        // Obtiene IDs necesarios, saliendo si son nulos (esto ya lo hacías, mejorarlo un poco)
+        // Obtiene IDs necesarios, saliendo si son nulos
         val taskId = tarea?.id ?: run {
             Toast.makeText(this, "Error: ID de tarea no encontrado.", Toast.LENGTH_SHORT).show()
             return
@@ -480,10 +480,11 @@ class AddEdit : AppCompatActivity() {
             return
         }
 
-
-        // **** CAMBIO CLAVE: Leer la tarea actual desde Firebase primero ****
+        // Referencia a la tarea específica en Firebase
         val taskRef = FirebaseDatabase.getInstance().reference.child("tasks").child(taskId)
 
+        // **** CAMBIO CLAVE: Leer la tarea actual desde Firebase primero ****
+        // Usamos addListenerForSingleValueEvent para leer los datos UNA SOLA VEZ
         taskRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 // Obtenemos la tarea original para acceder a sus asignaciones y estados de completado
@@ -492,47 +493,28 @@ class AddEdit : AppCompatActivity() {
                 val originalAssignments = originalTask?.assignments ?: emptyMap()
 
                 // Mapa para construir las NUEVAS asignaciones con estados de completado preservados
-                val nuevasAsignaciones = mutableMapOf<String, MutableMap<String, Boolean>>() // Usamos MutableMap para los días internos
-
-                var alMenosUnDiaSeleccionadoEnTotal = false // Bandera para verificar si al menos un día globalmente está seleccionado
+                val nuevasAsignaciones = mutableMapOf<String, Map<String, Boolean>>() // Mapa final para Firebase
 
                 // Itera sobre cada miembro que está AHORA asignado en la UI (miembrosAsignados)
                 for (miembroAsignadoUI in miembrosAsignados) {
                     val miembroId = miembroAsignadoUI.member.id
-                    // Días seleccionados en la UI para este miembro
-                    val diasSeleccionadosUI = miembroAsignadoUI.diasSeleccionados // Esto es un Map<String, Boolean> donde Boolean indica si está marcado en la UI
+                    // Días seleccionados en la UI para este miembro, con sus estados de completado (Map<String, Boolean>)
+                    val diasSeleccionadosUI = miembroAsignadoUI.diasSeleccionados
 
-                    val diasParaEsteMiembro = mutableMapOf<String, Boolean>() // Mapa para los días de este miembro en la NUEVA asignación
-
-                    // Itera sobre los días que están marcados como seleccionados en la UI para ESTE miembro
-                    for ((diaNombre, isSelectedInUI) in diasSeleccionadosUI) {
-                        if (isSelectedInUI) { // Si el checkbox para este día está marcado en la UI
-                            alMenosUnDiaSeleccionadoEnTotal = true // Confirmamos que al menos un día está seleccionado globalmente
-
-                            // **** Lógica para PRESERVAR el estado de completado ****
-                            // Buscamos este día y miembro en las asignaciones ORIGINALES de la tarea
-                            val originalStatus = originalAssignments[miembroId]?.get(diaNombre)
-
-                            // Añadimos el día al mapa de días para este miembro
-                            // Si el día YA existía en las asignaciones originales, usamos su estado (true/false).
-                            // Si el día NO existía en las asignaciones originales (es un día recién marcado o un miembro nuevo),
-                            // lo añadimos con el estado inicial 'false'.
-                            diasParaEsteMiembro[diaNombre] = originalStatus ?: false
-                        }
-                        // Si isSelectedInUI es false, simplemente no añadimos el día al mapa 'diasParaEsteMiembro',
-                        // lo que efectivamente lo elimina de las asignaciones si estaba antes.
+                    // Solo incluimos este miembro en las nuevas asignaciones si tiene al menos un día marcado en la UI
+                    if (diasSeleccionadosUI.isNotEmpty()) {
+                        // Usamos el mapa de días que ya está actualizado con los estados correctos desde la UI/carga inicial
+                        // El adapter se encargó de que diasSeleccionadosUI contenga los días marcados CON su estado de completado original o false.
+                        nuevasAsignaciones[miembroId] = diasSeleccionadosUI.toMap() // Convertimos a Inmutable Map si la estructura de Task lo requiere exactamente así
                     }
-
-                    // Si este miembro tiene al menos un día seleccionado en la UI, lo añadimos a las nuevas asignaciones
-                    if (diasParaEsteMiembro.isNotEmpty()) {
-                        nuevasAsignaciones[miembroId] = diasParaEsteMiembro
-                    }
-                    // Si diasParaEsteMiembro está vacío, este miembro no se incluirá en las nuevas asignaciones,
+                    // Si diasSeleccionadosUI está vacío, este miembro no se incluirá en las nuevas asignaciones,
                     // eliminándolo de la tarea si estaba previamente asignado.
                 }
 
-                // Validación final: Asegurarse de que al menos un día esté seleccionado en TODA la tarea
-                if (!alMenosUnDiaSeleccionadoEnTotal) {
+                // Validación final: Asegurarse de que el mapa final de asignaciones no esté vacío
+                if (nuevasAsignaciones.isEmpty()) {
+                    // Esto ocurrirá si miembrosAsignados estaba vacío inicialmente,
+                    // o si todos los miembros asignados desmarcaron todos sus días en la UI.
                     Toast.makeText(this@AddEdit, "La tarea debe tener al menos un día asignado en total.", Toast.LENGTH_SHORT).show()
                     return // Detiene la actualización
                 }
@@ -544,18 +526,27 @@ class AddEdit : AppCompatActivity() {
                     titulo = nombre,
                     descripcion = descripcion,
                     homeId = homeId,
-                    assignments = nuevasAsignaciones // Usa el mapa de asignaciones construido que mantiene 'true'
+                    assignments = nuevasAsignaciones // Usa el mapa de asignaciones construido
                 )
 
-                // **** Guarda el objeto actualizado en Firebase (reemplazando la versión anterior) ****
-                // Como reconstruimos el mapa de asignaciones con los estados correctos, setValue ahora es seguro.
+                // **** LOGGING 1: Ver qué intentas guardar ****
+                Log.d(TAG, "Intentando guardar tarea actualizada: ${tareaActualizada}")
+                // Si tareaActualizada.assignments no contiene al miembro nuevo aquí, el problema es en la construcción de nuevasAsignaciones.
+                // Si sí lo contiene, el problema es en el proceso de guardado o en Firebase.
+
+
+                // **** Guarda el objeto actualizado en Firebase (reemplazando el anterior) ****
+                // Como reconstruimos el mapa de asignaciones con los estados correctos en 'nuevasAsignaciones', setValue ahora es seguro.
                 taskRef.setValue(tareaActualizada)
                     .addOnSuccessListener {
+                        // **** LOGGING 2: Confirmar éxito ****
+                        Log.d(TAG, "Tarea actualizada exitosamente en Firebase")
                         Toast.makeText(this@AddEdit, "Tarea actualizada exitosamente", Toast.LENGTH_SHORT).show()
 
-
-                        val homeRef = FirebaseDatabase.getInstance().reference.child("homes").child(homeId)
-                        homeRef.child("tasks").push().setValue(taskId)
+                        // --- LÍNEA ELIMINADA ANTERIORMENTE ---
+                        // La línea homeRef.child("tasks").push().setValue(taskId) fue eliminada
+                        // porque solo debe añadir el ID de tarea a la lista del hogar en la creación (agregarTarea),
+                        // no en cada actualización.
 
 
                         // Navega de vuelta a MainActivity
@@ -565,12 +556,15 @@ class AddEdit : AppCompatActivity() {
                         finish() // Finaliza la actividad AddEdit
                     }
                     .addOnFailureListener { e ->
+                        // **** LOGGING 3: Ver error si falla ****
+                        Log.e(TAG, "Error al actualizar la tarea en Firebase", e)
                         Toast.makeText(this@AddEdit, "Error al actualizar la tarea: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 // Manejar el error de lectura de la tarea original
+                Log.e(TAG, "Error al leer la tarea original", error.toException())
                 Toast.makeText(this@AddEdit, "Error al leer la tarea original: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }) // Fin del listener de ValueEventListener

@@ -11,6 +11,10 @@ data class Task(
     val assignments: Map<String, Map<String, Boolean>> = emptyMap()
 ) : Parcelable {
 
+    // CAMBIO AÑADIDO: Constructor vacío explícito para Firebase
+    constructor() : this("", "", "", "", emptyMap())
+
+    // Tu constructor de Parcelable se mantiene igual
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
