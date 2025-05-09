@@ -311,7 +311,7 @@ class AddEdit : AppCompatActivity() {
             }
 
             // Agrega el miembro a la lista de asignados
-            miembrosAsignados.add(MembersDay(primerDisponible))
+            miembrosAsignados.add(MembersDay(primerDisponible, mutableMapOf()))
             // Actualiza el adaptador para reflejar el cambio
             actualizarAdapter()
             //Actualiza el estado del botón después de cargar a miembros
@@ -678,7 +678,8 @@ class MiembroAdapter(
                 val seleccionado = opciones[selectedIndex]
                 if (seleccionado != miembroActual.member) {
                     miembrosDisponibles.add(miembroActual.member)
-                    miembrosAsignados[position] = MembersDay(seleccionado)
+                    val diasPrevios = miembroActual.diasSeleccionados.toMutableMap()
+                    miembrosAsignados[position] = MembersDay(seleccionado, diasPrevios)
                     miembrosDisponibles.remove(seleccionado)
                     onListUpdate()
                 }
