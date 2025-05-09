@@ -504,11 +504,16 @@ class AddEdit : AppCompatActivity() {
                     val diasSeleccionadosUI = miembroAsignadoUI.diasSeleccionados
 
                     // Solo incluimos este miembro en las nuevas asignaciones si tiene al menos un día marcado en la UI
-                    if (diasSeleccionadosUI.isNotEmpty()) {
-                        // Usamos el mapa de días que ya está actualizado con los estados correctos desde la UI/carga inicial
-                        // El adapter se encargó de que diasSeleccionadosUI contenga los días marcados CON su estado de completado original o false.
+                    if (diasSeleccionadosUI.isEmpty()) {
+                        Toast.makeText(
+                            this@AddEdit,
+                            "El miembro ${miembroAsignadoUI.member.name} debe tener al menos un día asignado.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return
+                    } else {
                         val diasActualizados = diasSeleccionadosUI.keys.associateWith { false }
-                        nuevasAsignaciones[miembroId] = diasActualizados // Convertimos a Inmutable Map si la estructura de Task lo requiere exactamente así
+                        nuevasAsignaciones[miembroId] = diasActualizados
                     }
                     // Si diasSeleccionadosUI está vacío, este miembro no se incluirá en las nuevas asignaciones,
                     // eliminándolo de la tarea si estaba previamente asignado.
