@@ -172,8 +172,6 @@ class MiembroTareaAdapter(
             tvMiembro.text = nombre ?: "(Miembro no encontrado)"
         }
 
-        val btnCompletar =
-            view.findViewById<ImageButton>(R.id.btnCompletarTareaDetail) // Nada por q aqui no se usa pero por estetica lo dejo
 
         return view
     }
