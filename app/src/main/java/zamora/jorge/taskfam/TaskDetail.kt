@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.media.tv.TvInputManager
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import zamora.jorge.taskfam.data.Home
+import zamora.jorge.taskfam.data.Member
 import zamora.jorge.taskfam.data.Task
 import zamora.jorge.taskfam.databinding.ActivityTaskDetailBinding
 
@@ -68,6 +70,18 @@ class TaskDetail : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Obtiene el ID del usuario actual
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        val esAdmin = currentUserId == home?.adminId
+        val esEditable = home?.editable ?: false
+
+        //Muestra o oculta el boton de editar dependiendo de los permisos
+        if (esEditable || esAdmin) {
+            binding.editTask.visibility = View.VISIBLE
+        } else {
+            binding.editTask.visibility = View.GONE
+        }
+
         // Listener para el botón de editar la tarea, que navega a la actividad AddEdit en modo "EDITAR"
         binding.editTask.setOnClickListener {
             val intent = Intent(this, AddEdit::class.java)
@@ -96,13 +110,14 @@ class MiembroTareaAdapter(
     // Ontenemos la lista de ids de los miembros asignados a la tarea
     private val miembros = tarea.assignments.keys.toList()
     // Lista mutable de nombre de miembros
-    private val nombresMiembros = mutableMapOf<String, String?>()
+    private val miembrosMap = mutableMapOf<String, Member?>()
+    private var dataLoaded = false
 
     /**
      * Bloque de inicialización que carga los nombres de los miembros asignados.
      */
     init {
-        cargarNombresMiembros()
+        cargarDatosMiembros()
     }
 
     /**
@@ -110,19 +125,31 @@ class MiembroTareaAdapter(
      * y lo almacena en el mapa `nombresMiembros`. Notifica al adaptador cuando un nombre es cargado
      * para actualizar la vista.
      */
-    private fun cargarNombresMiembros() {
+    private fun cargarDatosMiembros() {
         val db = FirebaseDatabase.getInstance().reference
+        var miembrosCargados = 0
         miembros.forEach { miembroId ->
-            db.child("members").child(miembroId).child("name")
+            db.child("members").child(miembroId)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        nombresMiembros[miembroId] = snapshot.getValue(String::class.java)
-                        notifyDataSetChanged() // <- Esto actualiza la vista cuando llegue el nombre
+                        // Deserializa el snapshot a un objeto Member
+                        val miembro = snapshot.getValue(Member::class.java)?.copy(id = miembroId)
+                        miembrosMap[miembroId] = miembro
+                        miembrosCargados++
+                        if (miembrosCargados == miembros.size) {
+                            dataLoaded = true
+                            notifyDataSetChanged()
+                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        nombresMiembros[miembroId] = "(Error)"
-                        notifyDataSetChanged()
+                        Log.e("MiembroTareaAdapter", "Error al cargar datos del miembro: $miembroId", error.toException())
+                        miembrosMap[miembroId] = null
+                        miembrosCargados++
+                        if (miembrosCargados == miembros.size) {
+                            dataLoaded = true
+                            notifyDataSetChanged()
+                        }
                     }
                 })
         }
@@ -150,6 +177,8 @@ class MiembroTareaAdapter(
         val dias = tarea.assignments[miembroId] ?: emptyMap()
 
         val tvMiembro = view.findViewById<TextView>(R.id.tvMiembroDetail)
+        val ivColor = view.findViewById<ImageView>(R.id.iv_color)
+
         val checkBoxes = mapOf(
             "Lunes" to view.findViewById<CheckBox>(R.id.cbLunes),
             "Martes" to view.findViewById<CheckBox>(R.id.cbMartes),
@@ -168,29 +197,38 @@ class MiembroTareaAdapter(
             checkBox.isChecked = dias.containsKey(diaEsperado)
         }
         // Obtiene y muestra el nombre del miembro utilizando su ID
-        obtenerNombreMiembroPorId(miembroId) { nombre ->
-            tvMiembro.text = nombre ?: "(Miembro no encontrado)"
+        obtenerNombreMiembroPorId(miembroId) { miembro ->
+            tvMiembro.text = miembro?.name ?: "(Miembro no encontrado)"
+            val color = miembro?.color ?: Color.BLACK
+
+            // Creamos un circulo con GradientDrawable, para que se muestre correctamente en el detalle
+            val circleDrawable = GradientDrawable()
+            circleDrawable.shape = GradientDrawable.OVAL
+            circleDrawable.setColor(color)
+            ivColor.background = circleDrawable;
         }
 
 
         return view
     }
-    
+
     /**
-     * Obtiene el nombre de un miembro específico por su ID desde la base de datos de Firebase.
+     * Obtiene un miembro específico por su ID desde la base de datos de Firebase.
      * @param miembroId El ID del miembro cuyo nombre se desea obtener.
-     * @param callback Una función lambda que recibe el nombre del miembro (o null si no se encuentra).
+     * @param callback Una función lambda que recibe el objeto Member (o null si no se encuentra).
      */
-    fun obtenerNombreMiembroPorId(miembroId: String, callback: (String?) -> Unit) {
+    fun obtenerNombreMiembroPorId(miembroId: String, callback: (Member?) -> Unit) {
         val db = FirebaseDatabase.getInstance().reference
-        db.child("members").child(miembroId).child("name")
+        db.child("members").child(miembroId)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val nombre = snapshot.getValue(String::class.java)
-                    callback(nombre)
+                    // Intenta convertir el DataSnapshot directamente a la clase Member
+                    val miembro = snapshot.getValue(Member::class.java)?.copy(id = miembroId)
+                    callback(miembro)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
+                    Log.e("MiembroTareaAdapter", "Error al obtener miembro: $miembroId", error.toException())
                     callback(null)
                 }
             })

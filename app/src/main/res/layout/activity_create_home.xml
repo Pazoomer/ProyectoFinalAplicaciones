@@ -37,6 +37,7 @@
         android:textSize="23sp"
         android:textStyle="bold"
         android:drawableStart="@drawable/house_svg"
+        android:drawablePadding="10dp"
         android:paddingStart="16dp"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="30dp"
