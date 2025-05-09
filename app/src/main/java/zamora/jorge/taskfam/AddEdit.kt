@@ -507,7 +507,8 @@ class AddEdit : AppCompatActivity() {
                     if (diasSeleccionadosUI.isNotEmpty()) {
                         // Usamos el mapa de días que ya está actualizado con los estados correctos desde la UI/carga inicial
                         // El adapter se encargó de que diasSeleccionadosUI contenga los días marcados CON su estado de completado original o false.
-                        nuevasAsignaciones[miembroId] = diasSeleccionadosUI.toMap() // Convertimos a Inmutable Map si la estructura de Task lo requiere exactamente así
+                        val diasActualizados = diasSeleccionadosUI.keys.associateWith { false }
+                        nuevasAsignaciones[miembroId] = diasActualizados // Convertimos a Inmutable Map si la estructura de Task lo requiere exactamente así
                     }
                     // Si diasSeleccionadosUI está vacío, este miembro no se incluirá en las nuevas asignaciones,
                     // eliminándolo de la tarea si estaba previamente asignado.
