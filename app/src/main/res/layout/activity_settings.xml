@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".Settings">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="30dp">
 
     <ImageView
         android:id="@+id/ivBackArrow"
@@ -59,6 +63,8 @@
             app:tint="@color/gray_light" />
         <EditText
             android:maxLength="20"
+            android:inputType="text"
+            android:singleLine="true"
             android:id="@+id/etNombreHogar"
             android:layout_width="match_parent"
             android:layout_height="70dp"
@@ -172,4 +178,5 @@
 
     </LinearLayout>
     </ScrollView>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
