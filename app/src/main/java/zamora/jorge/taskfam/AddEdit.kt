@@ -112,6 +112,8 @@ class AddEdit : AppCompatActivity() {
                 }
 
 
+            }else {
+                binding.tvEliminar.visibility = View.GONE
             }
         }
 
